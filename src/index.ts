@@ -3,6 +3,7 @@ import { chatCompletions } from './web/aiApiEntry'
 import { PrismaClient } from "@prisma/client";
 import { PrismaD1 } from "@prisma/adapter-d1";
 
+let prisma:PrismaClient|null = null;
 
 export interface Env {
   DB: D1Database;
@@ -10,11 +11,18 @@ export interface Env {
 
 const app = new Hono();
 
+
 async function prepareDBConnection(c:Context, next:Next){
   console.log("prepareDBConnection");
+  if(prisma == null){
+    const adapter = new PrismaD1(c.env.DB);
+    prisma = new PrismaClient({ adapter });
+  }
+
+  await next();
 }
 
-//app.use(prepareDBConnection);
+app.use(prepareDBConnection);
 
 app.get('/', (c) => {
   return c.text('Hello, welcome to serverless ai gateway!')
@@ -22,10 +30,8 @@ app.get('/', (c) => {
 
 app.get('/testORM.json', async (c) => {
 
-  const adapter = new PrismaD1(c.env.DB);
-  const prisma = new PrismaClient({ adapter });
+  const users = await prisma!.user.findMany();
 
-  const users = await prisma.user.findMany();
   const result = JSON.stringify(users);
   return new Response(result);
 })

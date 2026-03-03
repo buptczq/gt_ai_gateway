@@ -5,9 +5,9 @@ import { SgVendor } from "../model/sgVendor";
 async function createModel(c: Context) {
     try {
         const body = await c.req.json();
-        const { name, vendor_id } = body;
+        const { name, vendor_id, enable = true } = body;
 
-        console.log("[modelController] Creating model:", { name, vendor_id });
+        console.log("[modelController] Creating model:", { name, vendor_id, enable });
 
         // Validate required fields
         if (!name || !vendor_id) {
@@ -23,6 +23,7 @@ async function createModel(c: Context) {
         const instance = await SgModel.query().create({
             name,
             vendor_id,
+            enable,
         });
 
         console.log("[modelController] Model created successfully:", instance);

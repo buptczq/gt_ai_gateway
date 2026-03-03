@@ -39,7 +39,7 @@ async function chatCompletions(c: Context) {
 
     //获取后端模型配置
     let modelName = bodyDict.model;
-    let modelConfig: SgModel | null = await modelService.getModel(modelName);
+    let modelConfig: SgModel | null = await modelService.getModel(modelName, true);
     console.log("modelConfig:", modelConfig);
 
     if (modelConfig == null) {
@@ -99,7 +99,7 @@ async function anthropicMessages(c: Context) {
 
     //获取后端模型配置
     let modelName = bodyDict.model;
-    let modelConfig: SgModel | null = await modelService.getModel(modelName);
+    let modelConfig: SgModel | null = await modelService.getModel(modelName, true);
     console.log("modelConfig:", modelConfig);
 
     if (modelConfig == null) {

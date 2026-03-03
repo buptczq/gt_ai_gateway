@@ -8,28 +8,33 @@ const MODEL_FIXTURES = {
     basic: (vendorId: number) => ({
         name: "test-model",
         vendor_id: vendorId,
+        enable: true,
     }),
     gpt35: (vendorId: number) => {
         const upstreamConfig = config.getCurrentUpstreamConfig();
         return {
             name: upstreamConfig.openai.model,
             vendor_id: vendorId,
+            enable: true,
         };
     },
     gpt4: (vendorId: number) => ({
         name: "gpt-4",
         vendor_id: vendorId,
+        enable: true,
     }),
     claudeHaiku: (vendorId: number) => {
         const upstreamConfig = config.getCurrentUpstreamConfig();
         return {
             name: upstreamConfig.anthropic.model,
             vendor_id: vendorId,
+            enable: true,
         };
     },
     claudeSonnet: (vendorId: number) => ({
         name: "claude-3-sonnet-20240229",
         vendor_id: vendorId,
+        enable: true,
     }),
 };
 
@@ -37,6 +42,7 @@ function createRandomModel(vendorId: number, name?: string) {
     return {
         name: name || `test-model-${Date.now()}`,
         vendor_id: vendorId,
+        enable: true,
     };
 }
 

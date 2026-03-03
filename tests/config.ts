@@ -7,12 +7,35 @@ import { join } from 'path'
 
 const PROJECT_ROOT = process.cwd()
 
+const TEST_MODE = process.env.TEST_MODE || 'node'
+
 /**
- * Server Configuration
+ * Node Mode Server Configuration
  */
-export const SERVER_CONFIG = {
+const NODE_SERVER_CONFIG = {
   baseUrl: process.env.TEST_BASE_URL || 'http://localhost:3000',
   port: parseInt(process.env.TEST_PORT || '3000', 10),
+}
+
+/**
+ * Worker Mode Server Configuration
+ */
+const WORKER_SERVER_CONFIG = {
+  baseUrl: 'http://localhost:8787',
+  port: 8787,
+}
+
+/**
+ * Server Configuration - dynamically selected based on TEST_MODE
+ */
+export const SERVER_CONFIG = TEST_MODE === 'worker' ? WORKER_SERVER_CONFIG : NODE_SERVER_CONFIG
+
+/**
+ * Worker Configuration
+ */
+export const WORKER_CONFIG = {
+  port: 8787,
+  startupTimeout: 30000, // 30 seconds for wrangler dev startup
 }
 
 /**
@@ -78,6 +101,8 @@ export default {
   DB_CONFIG,
   UPSTREAM_CONFIG,
   TEST_OPTIONS,
+  WORKER_CONFIG,
+  TEST_MODE,
   hasRealUpstream,
   useMockServer,
   logTest,

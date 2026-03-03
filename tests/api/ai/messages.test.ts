@@ -9,118 +9,165 @@ import { truncateDatabase } from '../../testHelpers'
  * AI Messages Endpoint Tests (Anthropic)
  */
 
+let testUserId: number
 let testUserToken: string
 let anthropicVendorId: number
+let anthropicModelId: number
 let anthropicModelName: string
 
 describe('AI Messages API (Anthropic)', () => {
-  beforeAll(async () => {
-    await truncateDatabase()
+    beforeAll(async () => {
+        await truncateDatabase()
 
-    // Create test user
-    const userResponse = await post('/user/create.json', generateUser())
-    testUserToken = userResponse.body.token
+        // Create test user
+        const userResponse = await post('/user/create.json', generateUser())
+        testUserId = userResponse.body.id
+        testUserToken = userResponse.body.token
 
-    // Create Anthropic vendor
-    const anthropicVendor = await post('/vendor/create.json', VENDOR_FIXTURES.anthropic)
-    console.log('Created vendor:', anthropicVendor.body)
-    anthropicVendorId = anthropicVendor.body.id
+        // Create Anthropic vendor
+        const anthropicVendor = await post('/vendor/create.json', VENDOR_FIXTURES.anthropic)
+        console.log('Created vendor:', anthropicVendor.body)
+        anthropicVendorId = anthropicVendor.body.id
 
-    // Create Anthropic model
-    const anthropicModel = await post('/model/create.json', createRandomModel(anthropicVendorId))
-    console.log('Created model:', anthropicModel.body)
-    anthropicModelName = anthropicModel.body.name
+        // Create Anthropic model
+        const anthropicModel = await post('/model/create.json', createRandomModel(anthropicVendorId))
+        console.log('Created model:', anthropicModel.body)
+        anthropicModelId = anthropicModel.body.id
+        anthropicModelName = anthropicModel.body.name
 
-    // Verify vendor creation
-    const vendorGet = await get(`/vendor/${anthropicVendorId}`)
-    console.log('Retrieved vendor:', vendorGet.body)
-  })
+        // Verify vendor creation
+        const vendorGet = await get(`/vendor/${anthropicVendorId}`)
+        console.log('Retrieved vendor:', vendorGet.body)
+    })
 
-  describe('POST /v1/messages', () => {
-    it('should handle successful Anthropic message request with x-api-key', async () => {
-      const messageRequest = generateAnthropicMessageRequest({
-        model: anthropicModelName,
-        stream: false,
-      })
+    describe('POST /v1/messages', () => {
+        it('should handle successful Anthropic message request with x-api-key', async () => {
+            const messageRequest = generateAnthropicMessageRequest({
+                model: anthropicModelName,
+                stream: false,
+            })
 
-      const response = await postWithApiKey('/v1/messages', messageRequest, testUserToken)
+            const response = await postWithApiKey('/v1/messages', messageRequest, testUserToken)
 
-      if (response.status !== 200) {
-        console.log('ERROR body:', response.body)
-      }
+            if (response.status !== 200) {
+                console.log('ERROR body:', response.body)
+            }
 
-      expect(response.status).toBe(200)
-      expect(response.body).toHaveProperty('id')
-      expect(response.body).toHaveProperty('type')
-      expect(response.body.type).toBe('message')
-      expect(response.body).toHaveProperty('role')
-      expect(response.body.role).toBe('assistant')
-      expect(response.body).toHaveProperty('content')
-      expect(Array.isArray(response.body.content)).toBe(true)
-      expect(response.body.content[0]).toHaveProperty('text')
-      expect(response.body).toHaveProperty('model')
-      expect(response.body).toHaveProperty('stop_reason')
-      expect(response.body).toHaveProperty('usage')
-    }, 30000)
+            expect(response.status).toBe(200)
+            expect(response.body).toHaveProperty('id')
+            expect(response.body).toHaveProperty('type')
+            expect(response.body.type).toBe('message')
+            expect(response.body).toHaveProperty('role')
+            expect(response.body.role).toBe('assistant')
+            expect(response.body).toHaveProperty('content')
+            expect(Array.isArray(response.body.content)).toBe(true)
+            expect(response.body.content[0]).toHaveProperty('text')
+            expect(response.body).toHaveProperty('model')
+            expect(response.body).toHaveProperty('stop_reason')
+            expect(response.body).toHaveProperty('usage')
 
-    it('should handle successful Anthropic message request with Authorization header', async () => {
-      const messageRequest = generateAnthropicMessageRequest({
-        model: anthropicModelName,
-        stream: false,
-      })
+            // Verify record was created
+            const recordsResponse = await get('/record/latest.json?limit=1')
+            expect(recordsResponse.status).toBe(200)
+            expect(recordsResponse.body.length).toBeGreaterThan(0)
+            const latestRecord = recordsResponse.body[0]
+            expect(latestRecord.user_id).toBe(testUserId)
+            expect(latestRecord.model_id).toBe(anthropicModelId)
+            expect(latestRecord.status).toBe('success')
 
-      const response = await post('/v1/messages', messageRequest, testUserToken)
+            // Verify request_data contains sent request
+            const requestData = JSON.parse(latestRecord.request_data)
+            expect(requestData).toHaveProperty('model')
+            expect(requestData).toHaveProperty('messages')
+            expect(requestData.model).toBe(anthropicModelName)
 
-      expect(response.status).toBe(200)
-      expect(response.body.type).toBe('message')
-      expect(response.body.role).toBe('assistant')
-    }, 30000)
+            // Verify response_data contains received response
+            const responseData = JSON.parse(latestRecord.response_data)
+            expect(responseData).toHaveProperty('id')
+            expect(responseData).toHaveProperty('type')
+            expect(responseData.type).toBe('message')
+            expect(responseData).toHaveProperty('content')
+            expect(responseData.content[0].text).toBe(response.body.content[0].text)
+        }, 30000)
 
-    it('should handle streaming Anthropic message request', async () => {
-      const messageRequest = generateAnthropicMessageRequest({
-        model: anthropicModelName,
-        stream: true,
-      })
+        it('should handle successful Anthropic message request with Authorization header', async () => {
+            const messageRequest = generateAnthropicMessageRequest({
+                model: anthropicModelName,
+                stream: false,
+            })
 
-      const response = await postWithApiKey('/v1/messages', messageRequest, testUserToken)
+            const response = await post('/v1/messages', messageRequest, testUserToken)
 
-      expect(response.status).toBe(200)
-      expect(typeof response.body).toBe('string')
-      expect(response.body).toContain('event:')
-      expect(response.body).toContain('message_start')
-      expect(response.body).toContain('content_block_delta')
-      expect(response.body).toContain('message_stop')
-    }, 30000)
+            expect(response.status).toBe(200)
+            expect(response.body.type).toBe('message')
+            expect(response.body.role).toBe('assistant')
+        }, 30000)
 
-    it('should handle multiple messages in request', async () => {
-      const messageRequest = generateAnthropicMessageRequest({
-        model: anthropicModelName,
-        stream: false,
-        messages: [
-          { role: 'user', content: 'Hello!' },
-          { role: 'assistant', content: 'Hi there!' },
-          { role: 'user', content: 'How are you?' },
-        ],
-      })
+        it('should handle streaming Anthropic message request', async () => {
+            const messageRequest = generateAnthropicMessageRequest({
+                model: anthropicModelName,
+                stream: true,
+            })
 
-      const response = await postWithApiKey('/v1/messages', messageRequest, testUserToken)
+            const response = await postWithApiKey('/v1/messages', messageRequest, testUserToken)
 
-      expect(response.status).toBe(200)
-      expect(response.body.type).toBe('message')
-      expect(response.body.role).toBe('assistant')
-    }, 30000)
+            expect(response.status).toBe(200)
+            expect(typeof response.body).toBe('string')
+            expect(response.body).toContain('event:')
+            expect(response.body).toContain('message_start')
+            expect(response.body).toContain('content_block_delta')
+            expect(response.body).toContain('message_stop')
 
-    it('should handle custom max_tokens value', async () => {
-      const messageRequest = generateAnthropicMessageRequest({
-        model: anthropicModelName,
-        stream: false,
-        max_tokens: 512,
-      })
+            // Verify record was created for streaming request
+            const recordsResponse = await get('/record/latest.json?limit=1')
+            expect(recordsResponse.status).toBe(200)
+            expect(recordsResponse.body.length).toBeGreaterThan(0)
+            const latestRecord = recordsResponse.body[0]
+            expect(latestRecord.user_id).toBe(testUserId)
+            expect(latestRecord.model_id).toBe(anthropicModelId)
+            expect(latestRecord.status).toBe('success')
 
-      const response = await postWithApiKey('/v1/messages', messageRequest, testUserToken)
+            // Verify request_data contains streaming flag
+            const requestData = JSON.parse(latestRecord.request_data)
+            expect(requestData.stream).toBe(true)
 
-      expect(response.status).toBe(200)
-      expect(response.body.type).toBe('message')
-    }, 30000)
-  })
+            // Verify response_data contains streaming response (stored as JSON string of last chunk)
+            const responseData = latestRecord.response_data
+            expect(typeof responseData).toBe('string')
+            const parsedResponseData = JSON.parse(responseData)
+            expect(parsedResponseData).toHaveProperty('choices')
+            expect(Array.isArray(parsedResponseData.choices)).toBe(true)
+        }, 30000)
+
+        it('should handle multiple messages in request', async () => {
+            const messageRequest = generateAnthropicMessageRequest({
+                model: anthropicModelName,
+                stream: false,
+                messages: [
+                    { role: 'user', content: 'Hello!' },
+                    { role: 'assistant', content: 'Hi there!' },
+                    { role: 'user', content: 'How are you?' },
+                ],
+            })
+
+            const response = await postWithApiKey('/v1/messages', messageRequest, testUserToken)
+
+            expect(response.status).toBe(200)
+            expect(response.body.type).toBe('message')
+            expect(response.body.role).toBe('assistant')
+        }, 30000)
+
+        it('should handle custom max_tokens value', async () => {
+            const messageRequest = generateAnthropicMessageRequest({
+                model: anthropicModelName,
+                stream: false,
+                max_tokens: 512,
+            })
+
+            const response = await postWithApiKey('/v1/messages', messageRequest, testUserToken)
+
+            expect(response.status).toBe(200)
+            expect(response.body.type).toBe('message')
+        }, 30000)
+    })
 })

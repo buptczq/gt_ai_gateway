@@ -1,6 +1,8 @@
 import { Context } from "hono";
 import { SgModel } from "../model/sgModel";
 import { SgVendor } from "../model/sgVendor";
+import modelService from "../service/modelService";
+
 
 async function checkDuplicateEnabledModel(
     name: string,
@@ -15,6 +17,7 @@ async function checkDuplicateEnabledModel(
     const existing = await query.first();
     return !!existing;
 }
+
 
 async function createModel(c: Context) {
     try {
@@ -62,10 +65,12 @@ async function createModel(c: Context) {
     }
 }
 
+
 async function listModels(c: Context) {
     const modelConfigs = await SgModel.query().get();
     return c.json(modelConfigs);
 }
+
 
 async function getModel(c: Context) {
     const id = c.req.param("id");
@@ -103,43 +108,16 @@ async function updateModel(c: Context) {
             enable,
         });
 
-        const model = await SgModel.query().find(modelId);
+        const updatedModel = await modelService.updateModel(modelId, {
+            name,
+            vendor_id,
+            enable,
+        });
 
-        if (!model) {
+        if (!updatedModel) {
             return c.json({ error: "Model not found" }, 404);
         }
 
-        // Validate vendor_id exists if provided
-        if (vendor_id !== undefined) {
-            const vendor = await SgVendor.query().find(vendor_id);
-            if (!vendor) {
-                return c.json({ error: "Vendor not found" }, 404);
-            }
-        }
-
-        // Check for duplicate enabled model when enabling or changing name
-        const newName = name ?? model.name;
-        const newEnable = enable !== undefined ? enable : model.enable;
-
-        if (newEnable) {
-            const isDuplicate = await checkDuplicateEnabledModel(newName, modelId);
-            if (isDuplicate) {
-                return c.json(
-                    { error: "An enabled model with this name already exists" },
-                    400,
-                );
-            }
-        }
-
-        await SgModel.query()
-            .where("id", modelId)
-            .update({
-                name: name ?? model.name,
-                vendor_id: vendor_id ?? model.vendor_id,
-                enable: enable !== undefined ? enable : model.enable,
-            });
-
-        const updatedModel = await SgModel.query().find(modelId);
         console.log("[modelController] Model updated successfully:", updatedModel);
         return c.json(updatedModel);
     } catch (error) {

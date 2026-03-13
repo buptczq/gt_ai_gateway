@@ -106,15 +106,15 @@ docker-compose down
 
 ```bash
 # 构建镜像
-docker build -t serverless-ai-gateway .
+docker build -t serverless_ai_gateway .
 
 # 运行容器
 docker run -d \
-    --name serverless-ai-gateway \
+    --name serverless_ai_gateway \
     -p 8787:8787 \
     -v $(pwd)/data:/app/data \
     -e ROOT_TOKEN=your-secret-root-token \
-    serverless-ai-gateway
+    serverless_ai_gateway
 ```
 
 #### 使用 Docker Hub
@@ -127,7 +127,7 @@ docker pull alexazhou/serverless_ai_gateway:latest
 
 # 运行容器
 docker run -d \
-    --name serverless-ai-gateway \
+    --name serverless_ai_gateway \
     -p 8787:8787 \
     -v $(pwd)/data:/app/data \
     -e ROOT_TOKEN=your-secret-root-token \

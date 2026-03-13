@@ -3,7 +3,7 @@ version: '3.8'
 services:
     app:
         build: .
-        container_name: serverless-ai-gateway
+        container_name: serverless_ai_gateway
         ports:
             - "8787:8787"
         environment:
@@ -22,8 +22,8 @@ services:
             retries: 3
             start_period: 5s
         networks:
-            - ai-gateway-network
+            - ai_gateway_network
 
 networks:
-    ai-gateway-network:
+    ai_gateway_network:
         driver: bridge

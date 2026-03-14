@@ -92,7 +92,7 @@ async function post(
 /**
  * Make a POST request with x-api-key header
  */
-async function postWithApiKey(
+async function postWithAnthropicStyleApiKey(
     endpoint: string,
     body: any,
     apiKey: string,
@@ -121,7 +121,9 @@ async function put(
     }
     return request(endpoint, {
         method: "PUT",
-        headers,
+        headers: {
+            ...headers,
+        },
         body: JSON.stringify(body),
     });
 }
@@ -152,7 +154,7 @@ export default {
     request,
     get,
     post,
-    postWithApiKey,
+    postWithAnthropicStyleApiKey,
     put,
     del,
 };

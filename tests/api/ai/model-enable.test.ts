@@ -71,7 +71,7 @@ describe("Gateway - Model Enable Filter", () => {
         });
 
         const response = await requestHelper.post(
-            "/v1/chat/completions",
+            "/llm/v1/chat/completions",
             chatRequest,
             normalToken,
         );
@@ -87,7 +87,7 @@ describe("Gateway - Model Enable Filter", () => {
         });
 
         const response = await requestHelper.post(
-            "/v1/chat/completions",
+            "/llm/v1/chat/completions",
             chatRequest,
             normalToken,
         );
@@ -105,7 +105,7 @@ describe("Gateway - Model Enable Filter", () => {
         });
 
         const response = await requestHelper.post(
-            "/v1/chat/completions",
+            "/llm/v1/chat/completions",
             chatRequest,
             normalToken,
         );

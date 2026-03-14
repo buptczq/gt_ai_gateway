@@ -192,7 +192,7 @@ describe("Record API", () => {
             });
 
             await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -219,7 +219,7 @@ describe("Record API", () => {
             });
 
             await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -250,7 +250,7 @@ describe("Record API", () => {
             });
 
             await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -279,7 +279,7 @@ describe("Record API", () => {
             });
 
             await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -308,7 +308,7 @@ describe("Record API", () => {
             });
 
             await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -356,7 +356,7 @@ describe("Record API", () => {
             });
 
             await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -402,7 +402,7 @@ describe("Record API", () => {
             });
 
             await requestHelper.post(
-                "/v1/messages",
+                "/llm/v1/messages",
                 messageRequest,
                 testUserToken,
             );
@@ -445,7 +445,7 @@ describe("Record API", () => {
             });
 
             await requestHelper.post(
-                "/v1/messages",
+                "/llm/v1/messages",
                 messageRequest,
                 testUserToken,
             );

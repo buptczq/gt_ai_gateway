@@ -77,7 +77,7 @@ describe("AI Chat API", () => {
         anthropicModelId = anthropicModel.body.id;
     });
 
-    describe("POST /v1/chat/completions", () => {
+    describe("POST /llm/v1/chat/completions", () => {
         it("should handle successful OpenAI chat request", async () => {
             const chatRequest = mockHelper.generateOpenAIChatRequest({
                 model: openaiModelName,
@@ -85,7 +85,7 @@ describe("AI Chat API", () => {
             });
 
             const response = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -143,7 +143,7 @@ describe("AI Chat API", () => {
             });
 
             const response = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -192,7 +192,7 @@ describe("AI Chat API", () => {
             });
 
             const response = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -216,7 +216,7 @@ describe("AI Chat API", () => {
             });
 
             const response = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
                 customHeaders,

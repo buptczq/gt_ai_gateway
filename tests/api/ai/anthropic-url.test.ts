@@ -29,14 +29,14 @@ describe("AI API - Anthropic URL & New Vendors", () => {
         testUserToken = userResponse.body.token;
     });
 
-    it("should automatically append /v1/messages to Anthropic URL if missing", async () => {
-        // Create vendor with INCOMPLETE Anthropic URL (no /v1/messages)
+    it("should automatically append /llm/v1/messages to Anthropic URL if missing", async () => {
+        // Create vendor with INCOMPLETE Anthropic URL (no /llm/v1/messages)
         const vendorData = {
             name: "Incomplete Anthropic Vendor",
             type: "anthropic",
             token: "test-token",
             urls: {
-                anthropic: mockServerUrl // Missing /v1/messages
+                anthropic: mockServerUrl // Missing /llm/v1/messages
             }
         };
 
@@ -49,15 +49,15 @@ describe("AI API - Anthropic URL & New Vendors", () => {
         const modelRes = await requestHelper.post("/model/create.json", modelData, adminToken);
         expect(modelRes.status).toBe(200);
 
-        // Send request - should succeed if URL is auto-corrected to include /v1/messages
+        // Send request - should succeed if URL is auto-corrected to include /llm/v1/messages
         // because mock server handles requests containing "/messages"
         const messageRequest = mockHelper.generateAnthropicMessageRequest({
             model: "claude-3-haiku-20240307",
             stream: false,
         });
 
-        const response = await requestHelper.postWithApiKey(
-            "/v1/messages",
+        const response = await requestHelper.postWithAnthropicStyleApiKey(
+            "/llm/v1/messages",
             messageRequest,
             testUserToken,
         );

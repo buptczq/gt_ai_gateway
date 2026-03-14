@@ -272,7 +272,7 @@ describe("Root Token Tests", () => {
 
         it("should allow OpenAI chat completions with root token", async () => {
             const response = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 {
                     model: modelName,
                     messages: [{ role: "user", content: "Hello" }],
@@ -300,8 +300,8 @@ describe("Root Token Tests", () => {
                 ROOT_TOKEN,
             );
 
-            const response = await requestHelper.postWithApiKey(
-                "/v1/messages",
+            const response = await requestHelper.postWithAnthropicStyleApiKey(
+                "/llm/v1/messages",
                 {
                     model: anthropicModel,
                     max_tokens: 1024,

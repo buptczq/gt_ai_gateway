@@ -66,15 +66,15 @@ describe("AI Messages API (Anthropic)", () => {
         console.log("Retrieved vendor:", vendorGet.body);
     });
 
-    describe("POST /v1/messages", () => {
+    describe("POST /llm/v1/messages", () => {
         it("should handle successful Anthropic message request with x-api-key", async () => {
             const messageRequest = mockHelper.generateAnthropicMessageRequest({
                 model: anthropicModelName,
                 stream: false,
             });
 
-            const response = await requestHelper.postWithApiKey(
-                "/v1/messages",
+            const response = await requestHelper.postWithAnthropicStyleApiKey(
+                "/llm/v1/messages",
                 messageRequest,
                 testUserToken,
             );
@@ -132,7 +132,7 @@ describe("AI Messages API (Anthropic)", () => {
             });
 
             const response = await requestHelper.post(
-                "/v1/messages",
+                "/llm/v1/messages",
                 messageRequest,
                 testUserToken,
             );
@@ -148,8 +148,8 @@ describe("AI Messages API (Anthropic)", () => {
                 stream: true,
             });
 
-            const response = await requestHelper.postWithApiKey(
-                "/v1/messages",
+            const response = await requestHelper.postWithAnthropicStyleApiKey(
+                "/llm/v1/messages",
                 messageRequest,
                 testUserToken,
             );
@@ -196,8 +196,8 @@ describe("AI Messages API (Anthropic)", () => {
                 ],
             });
 
-            const response = await requestHelper.postWithApiKey(
-                "/v1/messages",
+            const response = await requestHelper.postWithAnthropicStyleApiKey(
+                "/llm/v1/messages",
                 messageRequest,
                 testUserToken,
             );
@@ -214,8 +214,8 @@ describe("AI Messages API (Anthropic)", () => {
                 max_tokens: 512,
             });
 
-            const response = await requestHelper.postWithApiKey(
-                "/v1/messages",
+            const response = await requestHelper.postWithAnthropicStyleApiKey(
+                "/llm/v1/messages",
                 messageRequest,
                 testUserToken,
             );

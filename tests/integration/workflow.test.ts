@@ -68,7 +68,7 @@ describe("Integration Tests", () => {
                 stream: false,
             });
             const chatResponse = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 userToken,
             );
@@ -131,17 +131,17 @@ describe("Integration Tests", () => {
 
             // Make multiple requests
             const response1 = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 userToken,
             );
             const response2 = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 userToken,
             );
             const response3 = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 userToken,
             );
@@ -216,7 +216,7 @@ describe("Integration Tests", () => {
                         stream: false,
                     });
                     const response = await requestHelper.post(
-                        "/v1/chat/completions",
+                        "/llm/v1/chat/completions",
                         chatRequest,
                         user.token,
                     );

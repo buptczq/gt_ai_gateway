@@ -494,10 +494,10 @@ describe("Auth API Tests", () => {
     });
 
     describe("LLM API - No Auth Required", () => {
-        describe("POST /v1/chat/completions", () => {
+        describe("POST /llm/v1/chat/completions", () => {
             it("should work with normal user token", async () => {
                 const response = await requestHelper.post(
-                    "/v1/chat/completions",
+                    "/llm/v1/chat/completions",
                     {
                         model: "gpt-4",
                         messages: [
@@ -517,7 +517,7 @@ describe("Auth API Tests", () => {
 
             it("should work with admin token", async () => {
                 const response = await requestHelper.post(
-                    "/v1/chat/completions",
+                    "/llm/v1/chat/completions",
                     {
                         model: "gpt-4",
                         messages: [
@@ -536,10 +536,10 @@ describe("Auth API Tests", () => {
             });
         });
 
-        describe("POST /v1/messages", () => {
+        describe("POST /llm/v1/messages", () => {
             it("should work with normal user token", async () => {
                 const response = await requestHelper.post(
-                    "/v1/messages",
+                    "/llm/v1/messages",
                     {
                         model: "claude-3-opus-20240229",
                         max_tokens: 100,
@@ -563,7 +563,7 @@ describe("Auth API Tests", () => {
 
             it("should work with admin token", async () => {
                 const response = await requestHelper.post(
-                    "/v1/messages",
+                    "/llm/v1/messages",
                     {
                         model: "claude-3-opus-20240229",
                         max_tokens: 100,

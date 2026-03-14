@@ -71,14 +71,14 @@ describe("AI Chat API (Negative)", () => {
         );
     });
 
-    describe("POST /v1/chat/completions", () => {
+    describe("POST /llm/v1/chat/completions", () => {
         it("should return 401 when Authorization header is missing", async () => {
             const chatRequest = mockHelper.generateOpenAIChatRequest({
                 model: openaiModelName,
             });
 
             const response = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 undefined,
             );
@@ -94,7 +94,7 @@ describe("AI Chat API (Negative)", () => {
             });
 
             const response = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 "invalid-token-12345",
             );
@@ -110,7 +110,7 @@ describe("AI Chat API (Negative)", () => {
             });
 
             const response = await requestHelper.post(
-                "/v1/chat/completions",
+                "/llm/v1/chat/completions",
                 chatRequest,
                 testUserToken,
             );
@@ -121,14 +121,14 @@ describe("AI Chat API (Negative)", () => {
         }, 30000);
     });
 
-    describe("POST /v1/messages (Anthropic)", () => {
+    describe("POST /llm/v1/messages (Anthropic)", () => {
         it("should return 401 when x-api-key header is missing", async () => {
             const messageRequest = mockHelper.generateAnthropicMessageRequest({
                 model: anthropicModelName,
             });
 
             const response = await requestHelper.post(
-                "/v1/messages",
+                "/llm/v1/messages",
                 messageRequest,
                 undefined,
             );
@@ -143,8 +143,8 @@ describe("AI Chat API (Negative)", () => {
                 model: anthropicModelName,
             });
 
-            const response = await requestHelper.postWithApiKey(
-                "/v1/messages",
+            const response = await requestHelper.postWithAnthropicStyleApiKey(
+                "/llm/v1/messages",
                 messageRequest,
                 "invalid-token-12345",
             );
@@ -159,8 +159,8 @@ describe("AI Chat API (Negative)", () => {
                 model: "non-existent-model",
             });
 
-            const response = await requestHelper.postWithApiKey(
-                "/v1/messages",
+            const response = await requestHelper.postWithAnthropicStyleApiKey(
+                "/llm/v1/messages",
                 messageRequest,
                 testUserToken,
             );

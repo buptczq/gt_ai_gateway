@@ -3,7 +3,7 @@ import app from "./routes";
 import vendorDefaultUrls from "./service/vendorDefaultUrls";
 
 // 初始化云端配置
-await ormService.init({ mode: "cloud" });
+await ormService.init({ mode: "worker" });
 
 // 预加载 vendor 默认 URL 配置
 vendorDefaultUrls.loadDefaultUrls();

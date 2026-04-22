@@ -17,7 +17,7 @@ export interface Migration {
 
 // 解析命令行参数
 let command = "";
-let env = "local"; // default
+let env = "node"; // default
 let dbConfigPath = ""; // optional custom wrangler config
 let dbName = "serverless_ai_gateway"; // default database name
 
@@ -172,7 +172,7 @@ class WranglerDBAdapter implements DBAdapter {
 }
 
 function getAdapter(env: string): DBAdapter {
-    if (env === "local") {
+    if (env === "node") {
         return new LocalDBAdapter(LOCAL_DB_PATH);
     } else if (env === "worker-local") {
         return new WranglerDBAdapter("--local", dbConfigPath, dbName);
@@ -385,15 +385,15 @@ async function init(adapter: DBAdapter, env: string) {
 async function main() {
     if (!command) {
         console.error(
-            "Usage: npx tsx script/db.ts <command> [--env local|worker-local|worker-cloud]",
+            "Usage: npx tsx script/db.ts <command> [--env node|worker-local|worker-cloud]",
         );
         console.error("Commands: migrate, status, clear, init");
         process.exit(1);
     }
 
-    if (!["local", "worker-local", "worker-cloud"].includes(env)) {
+    if (!["node", "worker-local", "worker-cloud"].includes(env)) {
         console.error(
-            `Invalid environment: ${env}. Must be local, worker-local, or worker-cloud.`,
+            `Invalid environment: ${env}. Must be node, worker-local, or worker-cloud.`,
         );
         process.exit(1);
     }

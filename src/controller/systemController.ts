@@ -37,9 +37,9 @@ function formatUptime(startTime: Date): string {
 
 function welcome(c: Context) {
     const message =
-        ormService.mode === "cloud"
+        ormService.mode === "worker"
             ? "Hello, welcome to serverless ai gateway!"
-            : "Hello, welcome to serverless ai gateway (local mode)!";
+            : "Hello, welcome to serverless ai gateway (node mode)!";
     return c.text(message);
 }
 
@@ -63,7 +63,7 @@ async function status(c: Context) {
                 records: recordCount,
             },
             system: {
-                environment: ormService.mode === "cloud" ? "Cloudflare Workers" : "Local",
+                environment: ormService.mode === "worker" ? "Cloudflare Workers" : "Node",
                 version: packageJson.version,
                 startTime: startTime.toISOString(),
                 uptime: formatUptime(startTime),

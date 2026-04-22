@@ -72,7 +72,7 @@ async function startServer() {
 
     // 初始化本地配置
     await ormService.init({
-        mode: "local",
+        mode: "node",
         dbPath: DB_PATH,
     });
 

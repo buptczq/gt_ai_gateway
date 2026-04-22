@@ -180,21 +180,21 @@ log/                      # 或 LOG_DIR 指定的目录
 
 | 环境 | 说明 |
 |------|------|
-| `local`（默认） | 本地 Node.js 环境，操作 `local.db` |
+| `node`（默认） | 本地 Node.js 环境，操作 `local.db` |
 | `worker-local` | Wrangler 本地 D1 模拟器 |
 | `worker-cloud` | Cloudflare D1 云端数据库 |
 
 #### 使用示例
 
 ```bash
-# 执行迁移（local 环境）
-npm run db:migrate:local
+# 执行迁移（node 环境）
+npm run db:migrate:node
 
 # 查看迁移状态
-npm run db:status:local
+npm run db:status:node
 
 # 清空数据库
-npm run db:clear:local
+npm run db:clear:node
 
 # 指定 worker 环境
 npx tsx script/db.ts migrate --env worker-local

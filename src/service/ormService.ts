@@ -3,23 +3,23 @@ import { DatabaseAdapter, D1Adapter, SQLiteAdapter } from "./dbAdapter";
 import customError from "../util/customError";
 
 interface ORMOptions {
-    mode: "cloud" | "local";
+    mode: "worker" | "node";
     dbPath?: string;
 }
 
 class ORMService {
     private _dbAdapter: DatabaseAdapter | null = null;
-    public mode: "cloud" | "local" = "cloud";
+    public mode: "worker" | "node" = "worker";
 
     async init(options: ORMOptions): Promise<DatabaseAdapter> {
         const { mode, dbPath } = options;
         this.mode = mode;
 
-        if (mode === "cloud") {
+        if (mode === "worker") {
             this._dbAdapter = new D1Adapter();
         } else {
             if (!dbPath) {
-                throw new customError.AppError("dbPath is required for local mode", 500);
+                throw new customError.AppError("dbPath is required for node mode", 500);
             }
             const Database = (await import("better-sqlite3")).default;
 
@@ -38,19 +38,19 @@ class ORMService {
         return this._dbAdapter;
     }
 
-    private _cloudConnected = false;
+    private _workerConnected = false;
     private _connectPromise: Promise<void> | null = null;
 
-    async connectCloud(db: any) {
+    async connectWorker(db: any) {
         if (this._dbAdapter instanceof D1Adapter) {
             this._dbAdapter.setDB(db);
         }
 
-        if (!this._cloudConnected) {
+        if (!this._workerConnected) {
             // 使用 Promise 锁防止并发请求重复初始化连接
             // 第一个请求创建 Promise，后续并发请求 await 同一个 Promise
             if (!this._connectPromise) {
-                this._connectPromise = this._doConnectCloud(db);
+                this._connectPromise = this._doConnectWorker(db);
             }
             await this._connectPromise;
         }
@@ -86,7 +86,7 @@ class ORMService {
         }
     }
 
-    private async _doConnectCloud(db: any): Promise<void> {
+    private async _doConnectWorker(db: any): Promise<void> {
         const ClientD1 = (await import("knex-cloudflare-d1")).default;
 
         // === Cloudflare Workers 跨请求 I/O 修复 ===
@@ -133,21 +133,21 @@ class ORMService {
             },
             useNullAsDefault: true,
         });
-        this._cloudConnected = true;
+        this._workerConnected = true;
     }
 
     async prepareDBConnection(db: any) {
-        if (this.mode === "cloud") {
-            await this.connectCloud(db);
+        if (this.mode === "worker") {
+            await this.connectWorker(db);
         }
     }
 
-    get isLocal(): boolean {
-        return this.mode === "local";
+    get isNode(): boolean {
+        return this.mode === "node";
     }
 
-    get isCloud(): boolean {
-        return this.mode === "cloud";
+    get isWorker(): boolean {
+        return this.mode === "worker";
     }
 
     get dbAdapter(): DatabaseAdapter {

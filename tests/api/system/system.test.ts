@@ -24,13 +24,13 @@ describe("System API", () => {
             );
         });
 
-        it("should indicate local mode", async () => {
+        it("should indicate node mode", async () => {
             const response = await requestHelper.get("/welcome");
 
-            // In node mode: contains "local mode", in worker/cloud mode: contains "serverless ai gateway"
-            const isLocalMode = response.body.includes("local mode");
-            const isCloudMode = response.body.includes("serverless ai gateway");
-            expect(isLocalMode || isCloudMode).toBe(true);
+            // In node mode: contains "node mode", in worker mode: contains "serverless ai gateway"
+            const isNodeMode = response.body.includes("node mode");
+            const isWorkerMode = response.body.includes("serverless ai gateway") && !response.body.includes("node mode");
+            expect(isNodeMode || isWorkerMode).toBe(true);
         });
     });
 });

@@ -4,7 +4,7 @@ import { join } from "path";
 import sseAccumulator from "../../src/util/sseAccumulator";
 
 function requireFixture(fileName: string): string {
-    const logFile = join(__dirname, "..", "resource", fileName);
+    const logFile = join(__dirname, "..", "resource", "stream_logs", fileName);
 
     if (!existsSync(logFile)) {
         throw new Error(`Fixture not found: ${logFile}`);

@@ -253,7 +253,7 @@ describe("AI Messages API (Anthropic)", () => {
                         "anthropic-tool-use-stream-test.log",
                     );
 
-                expect(targetPath.endsWith("tests/resource/anthropic-tool-use-stream-test.log")).toBe(true);
+                expect(targetPath.endsWith("tests/resource/stream_logs/anthropic-tool-use-stream-test.log")).toBe(true);
                 expect(streamLog).toContain("\"tool_use\"");
                 expect(streamLog).toContain("\"input_json_delta\"");
                 expect(streamLog).toContain("\"stop_reason\":\"tool_use\"");

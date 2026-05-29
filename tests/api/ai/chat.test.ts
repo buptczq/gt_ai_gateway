@@ -249,7 +249,7 @@ describe("AI Chat API", () => {
                         "openai-tool-call-stream-test.log",
                     );
 
-                expect(targetPath.endsWith("tests/resource/openai-tool-call-stream-test.log")).toBe(true);
+                expect(targetPath.endsWith("tests/resource/stream_logs/openai-tool-call-stream-test.log")).toBe(true);
                 expect(streamLog).toContain("\"tool_calls\"");
                 expect(streamLog).toContain("\"get_weather\"");
                 expect(streamLog).toContain("\"finish_reason\":\"tool_calls\"");

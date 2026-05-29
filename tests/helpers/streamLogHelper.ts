@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
 
 const STREAM_LOG_DIR = join(process.cwd(), "log", "stream");
-const RESOURCE_DIR = join(process.cwd(), "tests", "resource");
+const RESOURCE_DIR = join(process.cwd(), "tests", "resource", "stream_logs");
 
 async function waitForStreamLog(recordId: number): Promise<string> {
     const logPath = join(STREAM_LOG_DIR, `${recordId}.log`);

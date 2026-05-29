@@ -36,7 +36,7 @@ lerna-debug.log*
 .claude/
 
 # test config (contains API keys)
-resource/test_real_config.json
+tests/resource/test_real_config.json
 
 # docker
 data/

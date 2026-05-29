@@ -116,8 +116,10 @@ pub fn run() {
         .setup(|app| {
             let app_data_dir = app
                 .path()
-                .app_data_dir()
-                .expect("failed to get app data dir");
+                .data_dir()
+                .expect("failed to get data dir")
+                .join("GtGroup")
+                .join("AiGateway");
 
             fs::create_dir_all(&app_data_dir)?;
 
@@ -132,6 +134,8 @@ pub fn run() {
                 .expect("exe has no parent dir")
                 .to_path_buf();
             let sidecar_path = exe_dir.join("ai-gateway-backend");
+            // resource 文件在 .app/Contents/Resources/resource/ 下
+            let resource_dir = exe_dir.join("../Resources/resource");
 
             // 打开 PTY pair
             let (master_raw, slave_path) = unsafe { open_pty() }
@@ -153,7 +157,8 @@ pub fn run() {
                .env("HOST", &config.host)
                .env("LOG_DIR", log_dir.to_str().unwrap())
                .env("ROOT_TOKEN", &config.root_token)
-               .env("DESKTOP_MODE", "1");
+               .env("DESKTOP_MODE", "1")
+               .env("MIGRATION_DIR", resource_dir.join("migrate").to_str().unwrap());
 
             // pre_exec：在 fork 之后、exec 之前在子进程中执行
             unsafe {

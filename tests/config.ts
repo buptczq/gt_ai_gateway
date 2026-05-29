@@ -60,7 +60,7 @@ function loadRealApiConfig() {
         return null;
     }
 
-    const configPath = join(PROJECT_ROOT, "resource", "test_real_config.json");
+    const configPath = join(PROJECT_ROOT, "tests", "resource", "test_real_config.json");
 
     if (!existsSync(configPath)) {
         console.warn(

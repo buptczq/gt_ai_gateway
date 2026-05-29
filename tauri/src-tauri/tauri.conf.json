@@ -1,7 +1,7 @@
 {
     "productName": "AI Gateway",
     "version": "1.4.7",
-    "identifier": "com.ai-gateway.desktop",
+    "identifier": "com.gtgroup.aigateway",
     "build": {
         "frontendDist": "../../frontend/dist",
         "devUrl": "http://localhost:5173",
@@ -24,6 +24,9 @@
     "bundle": {
         "active": true,
         "targets": "all",
+        "resources": {
+            "../../resource/migrate/*": "resource/migrate/"
+        },
         "externalBin": [
             "../build/binaries/ai-gateway-backend"
         ],

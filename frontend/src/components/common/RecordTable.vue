@@ -161,7 +161,7 @@ function getStatusText(status: string | null, failedCode?: string | null): strin
             return '成功';
         case 'failed':
             return failedCode
-                ? `失败：${FAILED_CODE_LABELS[failedCode] ?? failedCode}`
+                ? `失败:${FAILED_CODE_LABELS[failedCode] ?? failedCode}`
                 : '失败';
         case 'processing':
             return '处理中';

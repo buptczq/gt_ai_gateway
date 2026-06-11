@@ -401,7 +401,7 @@ function downloadJson(data: string | null, type: 'request' | 'response') {
 }
 
 .visualization-container {
-    height: 500px;
+    height: 700px;
     width: 100%;
 }
 

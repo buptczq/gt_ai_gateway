@@ -6,7 +6,6 @@ async function initSplash() {
     const errorState = document.getElementById('errorState')!;
     const btnExit = document.getElementById('btnExit')!;
     const errorText = document.getElementById('errorText')!;
-    const subtitle = document.querySelector('.subtitle') as HTMLElement;
 
     let hasError = false;
 
@@ -16,7 +15,6 @@ async function initSplash() {
         const code = event.payload;
         loadingState.style.display = 'none';
         errorState.style.display = 'flex';
-        subtitle.style.display = 'none';
         
         if (code === 98) {
             errorText.innerHTML = `后端 <b>8787</b> 端口被占用。 请清理占用端口的进程，或者修改配置文件中的服务端口。`;
@@ -45,7 +43,6 @@ async function initSplash() {
                 hasError = true;
                 loadingState.style.display = 'none';
                 errorState.style.display = 'flex';
-                subtitle.style.display = 'none';
                 if (code === 98) {
                     errorText.innerHTML = `后端 <b>8787</b> 端口被占用。 请清理占用端口的进程，或者修改配置文件中的服务端口。`;
                 } else {
@@ -81,6 +78,9 @@ async function initSplash() {
         localStorage.setItem('adminToken', token);
         localStorage.setItem('backendBaseURL', url);
 
+        // 人为增加 6 秒延迟，方便看清启动画面
+        await new Promise(r => setTimeout(r, 6000));
+
         // Tell Rust to open the main window and close this splash screen
         await invoke('open_main_window');
 
@@ -88,7 +88,6 @@ async function initSplash() {
         if (!hasError) {
             loadingState.style.display = 'none';
             errorState.style.display = 'flex';
-            subtitle.style.display = 'none';
             errorText.innerText = `Initialization Error: ${e.message || e}`;
         }
     }

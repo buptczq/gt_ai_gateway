@@ -1,7 +1,7 @@
 <template>
     <div class="token-display">
-        <span v-if="showFull">{{ token }}</span>
-        <span v-else>{{ maskedToken }}</span>
+        <span v-if="showFull" class="token-text">{{ token }}</span>
+        <span v-else class="token-text">{{ maskedToken }}</span>
         <a-button
             type="link"
             size="small"
@@ -43,8 +43,8 @@ const showFull = ref(false);
 
 const maskedToken = computed(() => {
     if (!props.token) return '';
-    if (props.token.length <= 8) return '****';
-    return `${props.token.slice(0, 4)}...${props.token.slice(-4)}`;
+    if (props.token.length <= 8) return '******';
+    return `${props.token.slice(0, 4)}******${props.token.slice(-4)}`;
 });
 
 function toggle() {
@@ -67,5 +67,9 @@ function copyToken() {
 
 .icon-button {
     padding-inline: 4px;
+}
+
+.token-text {
+    font-family: monospace;
 }
 </style>

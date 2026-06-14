@@ -6,8 +6,8 @@ export function formatDate(date: Date | string | number, format: string = 'YYYY-
 
 export function maskToken(token: string, showLength: number = 4): string {
     if (!token) return '';
-    if (token.length <= showLength * 2) return '****';
-    return `${token.slice(0, showLength)}...${token.slice(-showLength)}`;
+    if (token.length <= showLength * 2) return '******';
+    return `${token.slice(0, showLength)}******${token.slice(-showLength)}`;
 }
 
 export function truncateText(text: string, maxLength: number = 50): string {

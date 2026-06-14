@@ -142,7 +142,6 @@ async function startServer() {
     });
 
     server.on('listening', () => {
-        console.log(`Server listening on http://${hostname}:${port}`);
         console.log(`ROOT_TOKEN: ${bindings.ROOT_TOKEN}`);
         // Bypass Node.js stdout block-buffering for pipes by using writeSync
         require('fs').writeSync(1, `Server listening on http://${hostname}:${port}\n`);

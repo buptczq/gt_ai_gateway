@@ -8,8 +8,11 @@ on:
 
 jobs:
   build-mac:
-    name: Build macOS App
+    name: Build macOS App (${{ matrix.target }})
     runs-on: macos-14 # Use Apple Silicon runner
+    strategy:
+      matrix:
+        target: [aarch64-apple-darwin, x86_64-apple-darwin]
 
     steps:
       - name: Checkout code
@@ -23,11 +26,12 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+          architecture: ${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-darwin
+          targets: ${{ matrix.target }}
 
       - name: Rust Cache
         uses: swatinem/rust-cache@v2
@@ -44,7 +48,12 @@ jobs:
         run: cd tauri && npm ci
 
       - name: Build backend sidecar
-        run: npm run tauri:build-backend
+        run: |
+          if [ "${{ matrix.target }}" == "x86_64-apple-darwin" ]; then
+            npm run tauri:build-backend-x86_64
+          else
+            npm run tauri:build-backend-arm64
+          fi
 
       - name: Install Apple Certificate
         env:
@@ -64,7 +73,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: './tauri'
-          args: '--target aarch64-apple-darwin --bundles app'
+          args: '--target ${{ matrix.target }} --bundles app'
 
       - name: Manual Code Sign and Notarization
         env:
@@ -74,13 +83,13 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cd tauri/scripts
-          python3 build_release.py
+          python3 build_release.py ${{ matrix.target }}
 
       - name: Upload macOS Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: macOS-app
-          path: tauri/build/target/aarch64-apple-darwin/release/bundle/signed_dmg/*.dmg
+          name: macOS-app-${{ matrix.target }}
+          path: tauri/build/target/${{ matrix.target }}/release/bundle/signed_dmg/*.dmg
           if-no-files-found: warn
 
   create-release:
@@ -112,8 +121,9 @@ jobs:
         if: steps.version_tag.outputs.matched == 'true'
         uses: actions/download-artifact@v8
         with:
-          name: macOS-app
+          pattern: macOS-app-*
           path: release-artifacts
+          merge-multiple: true
 
       - name: Create or update release
         if: steps.version_tag.outputs.matched == 'true'

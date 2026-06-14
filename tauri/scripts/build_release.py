@@ -18,11 +18,17 @@ def run_command(command):
         sys.exit(return_code)
 
 def main():
+    if len(sys.argv) < 2:
+        print("❌ Error: Missing target argument. Usage: python3 build_release.py <target>")
+        sys.exit(1)
+        
+    target = sys.argv[1]
+
     # Change working directory to the script's directory
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     # 1. Setup paths
-    bundle_dir = "../build/target/aarch64-apple-darwin/release/bundle"
+    bundle_dir = f"../build/target/{target}/release/bundle"
     macos_dir = os.path.join(bundle_dir, "macos")
     
     apps = glob.glob(os.path.join(macos_dir, "*.app"))

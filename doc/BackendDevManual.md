@@ -223,15 +223,15 @@ DB_PATH=/path/to/your/custom.db
 
 ### Cloudflare Workers 部署
 有关如何将后端部署到 Cloudflare Workers 的详细步骤（包括 D1 数据库配置和一键部署），请参考专门的文档：
-👉 **[Cloudflare 部署文档](CloudflareDeployment.md)**
+👉 **[Cloudflare 部署文档](deploy/CloudflareDeployment.md)**
 
 ### Docker 部署
 Docker 部署相关内容已单独整理，包括 Docker Compose 部署和独立运行等。请参考专门的文档：
-👉 **[Docker 部署文档](DockerDeployment.md)**
+👉 **[Docker 部署文档](deploy/DockerDeployment.md)**
 
 ### 源码部署
 如果需要在本地物理机或者私有服务器通过 Node.js 原生运行，请参考：
-👉 **[源码部署文档](SourceCodeDeployment.md)**
+👉 **[源码部署文档](deploy/SourceCodeDeployment.md)**
 
 ---
 

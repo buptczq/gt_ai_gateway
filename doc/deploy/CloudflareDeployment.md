@@ -104,4 +104,4 @@ npm run backend:deploy
 
 在浏览器中打开部署成功后输出的链接，输入您刚才配置的 `ROOT_TOKEN` 即可登录进入管理后台。
 
-后续的具体使用和渠道配置，请参考 [系统配置指南](ConfigurationGuide.md)。
+后续的具体使用和渠道配置，请参考 [系统配置指南](../ConfigurationGuide.md)。

@@ -21,7 +21,7 @@
 ### 1. Serverless 部署 (Cloudflare Workers)
 最适合追求极致弹性、零维护成本和高可用性的场景。可以将其部署至 Cloudflare Workers 等 Serverless 平台，享受边缘计算网络带来的低延迟和自动扩缩容。
 - 结合 Cloudflare D1 等云端数据库进行数据持久化。
-- 详见：[Cloudflare 部署文档](doc/CloudflareDeployment.md)。
+- 详见：[Cloudflare 部署文档](doc/deploy/CloudflareDeployment.md)。
 
 ### 2. Docker 部署 (推荐服务器使用)
 最适合自建服务器部署的方式。开箱即用，容器化隔离，数据方便挂载与备份。
@@ -34,7 +34,7 @@ docker run -d \
     -e ROOT_TOKEN=your-secret-root-token \
     ghcr.io/alexazhou/gt_ai_gateway:latest
 ```
-启动后访问 `http://localhost:8787` 即可进入管理界面。详见：[Docker 部署文档](doc/DockerDeployment.md)。
+启动后访问 `http://localhost:8787` 即可进入管理界面。详见：[Docker 部署文档](doc/deploy/DockerDeployment.md)。
 
 ### 3. 桌面客户端 (App) 运行
 最适合个人用户的即开即用模式。无需配置复杂的环境，直接下载安装包即可运行本地客户端。
@@ -42,7 +42,7 @@ docker run -d \
 
 ### 4. Node 方式直接运行代码
 适合二次开发、代码贡献者或希望在本地物理机环境原生运行服务的用户。
-- 详见：[Node 方式部署文档](doc/SourceCodeDeployment.md)。
+- 详见：[Node 方式部署文档](doc/deploy/SourceCodeDeployment.md)。
 
 ## 新手指南：从零开始配置
 
@@ -55,9 +55,9 @@ docker run -d \
 如果您希望参与到项目中，或者深入了解系统的运作原理，请参考以下详细文档：
 
 - **基础部署与使用**
-  - [Cloudflare 部署文档](doc/CloudflareDeployment.md)
-  - [Docker 部署文档](doc/DockerDeployment.md)
-  - [源码部署文档](doc/SourceCodeDeployment.md)
+  - [Cloudflare 部署文档](doc/deploy/CloudflareDeployment.md)
+  - [Docker 部署文档](doc/deploy/DockerDeployment.md)
+  - [源码部署文档](doc/deploy/SourceCodeDeployment.md)
   - [系统配置与使用指南](doc/ConfigurationGuide.md)
   - [LLM API 使用指南](doc/LlmApiUsage.md)
 

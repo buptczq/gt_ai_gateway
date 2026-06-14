@@ -41,7 +41,7 @@ async function checkUpdate(ctx: SgContext): Promise<UpdateStatus> {
     };
 
     try {
-        const response = await fetch("https://api.github.com/repos/alexazhou/serverless_ai_gateway/releases/latest", {
+        const response = await fetch("https://api.github.com/repos/alexazhou/gt_ai_gateway/releases/latest", {
             headers: {
                 "User-Agent": `Serverless-AI-Gateway/${currentVersion}`,
                 "Accept": "application/vnd.github.v3+json"

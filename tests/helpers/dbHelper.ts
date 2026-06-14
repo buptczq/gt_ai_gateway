@@ -9,7 +9,7 @@ import {
 } from "../../script/db";
 
 // Worker mode configuration - use test database
-const TEST_DB_NAME = "serverless_ai_gateway_test";
+const TEST_DB_NAME = "gt_ai_gateway_test";
 const TEST_WRANGLER_CONFIG = "wrangler.test.toml";
 
 

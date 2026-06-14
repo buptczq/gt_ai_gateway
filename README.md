@@ -25,11 +25,11 @@
 
 ```bash
 docker run -d \
-    --name serverless_ai_gateway \
+    --name gt_ai_gateway \
     -p 8787:8787 \
     -v $(pwd)/data:/app/data \
     -e ROOT_TOKEN=your-secret-root-token \
-    alexazhou/serverless_ai_gateway:latest
+    alexazhou/gt_ai_gateway:latest
 ```
 
 访问 `http://localhost:8787` 即可使用。更多 Docker 部署方式请参考 [Docker 部署文档](doc/DockerDeployment.md)。

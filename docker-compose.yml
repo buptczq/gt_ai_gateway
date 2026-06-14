@@ -3,7 +3,7 @@ version: '3.8'
 services:
     app:
         build: .
-        container_name: serverless_ai_gateway
+        container_name: gt_ai_gateway
         ports:
             - "8787:8787"
         environment:

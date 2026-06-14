@@ -52,41 +52,41 @@ docker-compose down
 ### 构建镜像
 
 ```bash
-docker build -t serverless_ai_gateway .
+docker build -t gt_ai_gateway .
 ```
 
 ### 运行容器
 
 ```bash
 docker run -d \
-    --name serverless_ai_gateway \
+    --name gt_ai_gateway \
     -p 8787:8787 \
     -v $(pwd)/data:/app/data \
     -e ROOT_TOKEN=your-secret-root-token \
-    serverless_ai_gateway
+    gt_ai_gateway
 ```
 
 ### 常用操作
 
 ```bash
 # 查看日志
-docker logs -f serverless_ai_gateway
+docker logs -f gt_ai_gateway
 
 # 停止容器
-docker stop serverless_ai_gateway
+docker stop gt_ai_gateway
 
 # 启动容器
-docker start serverless_ai_gateway
+docker start gt_ai_gateway
 
 # 删除容器
-docker rm -f serverless_ai_gateway
+docker rm -f gt_ai_gateway
 ```
 
 ### 直接执行 db 工具
 
 ```bash
-docker exec -it serverless_ai_gateway npx tsx script/db.ts status --env node
-docker exec -it serverless_ai_gateway npm run db:migrate:node
+docker exec -it gt_ai_gateway npx tsx script/db.ts status --env node
+docker exec -it gt_ai_gateway npm run db:migrate:node
 ```
 
 ---
@@ -96,18 +96,18 @@ docker exec -it serverless_ai_gateway npm run db:migrate:node
 ### 拉取镜像
 
 ```bash
-docker pull alexazhou/serverless_ai_gateway:latest
+docker pull alexazhou/gt_ai_gateway:latest
 ```
 
 ### 运行容器
 
 ```bash
 docker run -d \
-    --name serverless_ai_gateway \
+    --name gt_ai_gateway \
     -p 8787:8787 \
     -v $(pwd)/data:/app/data \
     -e ROOT_TOKEN=your-secret-root-token \
-    alexazhou/serverless_ai_gateway:latest
+    alexazhou/gt_ai_gateway:latest
 ```
 
 ---
@@ -149,7 +149,7 @@ docker run -d \
 可以通过以下命令查看健康状态：
 
 ```bash
-docker inspect --format='{{.State.Health.Status}}' serverless_ai_gateway
+docker inspect --format='{{.State.Health.Status}}' gt_ai_gateway
 ```
 
 ---
@@ -160,10 +160,10 @@ docker inspect --format='{{.State.Health.Status}}' serverless_ai_gateway
 
 ```bash
 # 查看容器日志
-docker logs serverless_ai_gateway
+docker logs gt_ai_gateway
 
 # 进入容器排查
-docker exec -it serverless_ai_gateway sh
+docker exec -it gt_ai_gateway sh
 ```
 
 ### 数据库初始化失败

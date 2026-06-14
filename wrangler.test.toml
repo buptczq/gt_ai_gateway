@@ -1,4 +1,4 @@
-name = "serverless_ai_gateway_test"
+name = "gt_ai_gateway_test"
 main = "src/index.ts"
 compatibility_date = "2025-01-19"
 
@@ -9,7 +9,7 @@ ROOT_TOKEN = "root-token-123"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "serverless_ai_gateway_test"
+database_name = "gt_ai_gateway_test"
 database_id = "test-database-id"
 
 [observability]

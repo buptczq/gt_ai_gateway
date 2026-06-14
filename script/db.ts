@@ -19,7 +19,7 @@ export interface Migration {
 let command = "";
 let env = "node"; // default
 let dbConfigPath = ""; // optional custom wrangler config
-let dbName = "serverless_ai_gateway"; // default database name
+let dbName = "gt_ai_gateway"; // default database name
 
 for (let i = 0; i < args.length; i++) {
     if (args[i] === "--env" || args[i] === "-e") {
@@ -100,7 +100,7 @@ class WranglerDBAdapter implements DBAdapter {
     private configPath: string;
     private dbName: string;
 
-    constructor(target: "--local" | "--remote", configPath: string = "", dbName: string = "serverless_ai_gateway") {
+    constructor(target: "--local" | "--remote", configPath: string = "", dbName: string = "gt_ai_gateway") {
         this.target = target;
         this.configPath = configPath;
         this.dbName = dbName;

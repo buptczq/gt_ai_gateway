@@ -45,7 +45,7 @@ jobs:
               id: meta
               uses: docker/metadata-action@v6
               with:
-                  images: alexazhou/serverless_ai_gateway
+                  images: alexazhou/gt_ai_gateway
                   flavor: |
                       suffix=-${{ matrix.suffix }}
                   tags: |
@@ -91,7 +91,7 @@ jobs:
               id: meta
               uses: docker/metadata-action@v6
               with:
-                  images: alexazhou/serverless_ai_gateway
+                  images: alexazhou/gt_ai_gateway
                   tags: |
                       type=semver,pattern={{version}}
                       type=semver,pattern={{major}}.{{minor}}
@@ -128,10 +128,10 @@ jobs:
                       # Delete amd64 suffix tag
                       curl -s -X DELETE \
                           -H "Authorization: Basic $(echo -n "$username:$token" | base64)" \
-                          "https://hub.docker.com/v2/repositories/alexazhou/serverless_ai_gateway/tags/${tag#*:}-amd64/" || true
+                          "https://hub.docker.com/v2/repositories/alexazhou/gt_ai_gateway/tags/${tag#*:}-amd64/" || true
 
                       # Delete arm64 suffix tag
                       curl -s -X DELETE \
                           -H "Authorization: Basic $(echo -n "$username:$token" | base64)" \
-                          "https://hub.docker.com/v2/repositories/alexazhou/serverless_ai_gateway/tags/${tag#*:}-arm64/" || true
+                          "https://hub.docker.com/v2/repositories/alexazhou/gt_ai_gateway/tags/${tag#*:}-arm64/" || true
                   done

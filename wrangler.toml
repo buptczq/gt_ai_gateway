@@ -1,4 +1,4 @@
-name = "serverless_ai_gateway"
+name = "gt_ai_gateway"
 main = "src/index.ts"
 compatibility_date = "2025-01-19"
 
@@ -18,7 +18,7 @@ compatibility_flags = [ "nodejs_compat", "no_handle_cross_request_promise_resolu
 
 [[d1_databases]]
 binding = "DB"
-database_name = "serverless_ai_gateway"
+database_name = "gt_ai_gateway"
 database_id = "d49ccfb6-84db-4836-80e4-8dd82f7dd029"
 
 # [ai]

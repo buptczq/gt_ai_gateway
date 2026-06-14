@@ -5,7 +5,7 @@ import sender from "../service/senderService";
 import { SgModel } from "../model/sgModel";
 import { SgUser } from "../model/sgUser";
 import { SgVendor } from "../model/sgVendor";
-import { ApiFormat } from "../constants";
+import { ApiFormat, UserStatus } from "../constants";
 
 async function chatCompletions(c: Context) {
     let body: string = await c.req.text();
@@ -29,6 +29,10 @@ async function chatCompletions(c: Context) {
 
     if (user == null) {
         return c.json({ error: "Invalid token (user not found)" }, 401);
+    }
+
+    if (user.status === UserStatus.DISABLED) {
+        return c.json({ error: "User disabled" }, 403);
     }
 
     //解析请求
@@ -86,6 +90,10 @@ async function anthropicMessages(c: Context) {
         return c.json({ error: "Invalid token (user not found)" }, 401);
     }
 
+    if (user.status === UserStatus.DISABLED) {
+        return c.json({ error: "User disabled" }, 403);
+    }
+
     //解析请求
     let bodyDict = JSON.parse(body);
     console.log("bodyDict:", bodyDict, typeof bodyDict);
@@ -127,6 +135,9 @@ async function responsesApi(c: Context) {
     const user = await userService.getUserByToken(token!, c.env.ROOT_TOKEN);
     if (user == null) {
         return c.json({ error: "Invalid token (user not found)" }, 401);
+    }
+    if (user.status === UserStatus.DISABLED) {
+        return c.json({ error: "User disabled" }, 403);
     }
 
     let bodyDict = JSON.parse(body);

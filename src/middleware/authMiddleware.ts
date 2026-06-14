@@ -1,6 +1,6 @@
 import { Context, MiddlewareHandler } from "hono";
 import userService from "../service/userService";
-import { UserType, ROOT_USER_ID } from "../constants";
+import { UserType, ROOT_USER_ID, UserStatus } from "../constants";
 
 const requireAdmin: MiddlewareHandler = async (c, next) => {
     const authHeader = c.req.header("Authorization");
@@ -14,6 +14,10 @@ const requireAdmin: MiddlewareHandler = async (c, next) => {
 
     if (!user) {
         return c.json({ error: "Invalid token" }, 401);
+    }
+
+    if (user.status === UserStatus.DISABLED) {
+        return c.json({ error: "User disabled" }, 403);
     }
 
     c.set("user_type", user.type);

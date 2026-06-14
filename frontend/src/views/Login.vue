@@ -1,6 +1,12 @@
 <template>
     <div class="login-container">
-        <a-card class="login-card" title="GT AI Gateway">
+        <a-card class="login-card">
+            <template #title>
+                <div class="card-title">
+                    <img src="/favicon.svg" alt="Logo" class="logo" />
+                    <span>GT AI Gateway</span>
+                </div>
+            </template>
             <a-form
                 :model="formState"
                 :rules="rules"
@@ -57,13 +63,13 @@ async function handleLogin() {
 
     loading.value = true;
     try {
-        const success = await authStore.login(formState.token);
-        if (success) {
+        const result = await authStore.login(formState.token);
+        if (result.success) {
             notifySuccess('登录成功');
             const redirect = router.currentRoute.value.query.redirect as string;
             router.push(redirect || '/dashboard');
         } else {
-            notifyError('Token 验证失败');
+            notifyError(result.message === 'User disabled' ? '该账号已被禁用' : result.message || 'Token 验证失败');
         }
     } catch (_error) {
         notifyError('登录失败，请检查 Token');
@@ -87,5 +93,17 @@ async function handleLogin() {
 
 .login-card {
     width: 400px;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 </style>

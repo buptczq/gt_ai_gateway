@@ -21,8 +21,8 @@ export const useAuthStore = defineStore('auth', () => {
         clearAuthToken();
     }
 
-    async function validateToken(): Promise<boolean> {
-        if (!token.value) return false;
+    async function validateToken(): Promise<{ success: boolean; message?: string }> {
+        if (!token.value) return { success: false, message: '请输入 Token' };
 
         isLoading.value = true;
         try {
@@ -32,16 +32,17 @@ export const useAuthStore = defineStore('auth', () => {
             } else {
                 userType.value = 'admin';
             }
-            return true;
-        } catch {
+            return { success: true };
+        } catch (error: any) {
             clearToken();
-            return false;
+            const message = error?.response?.data?.error || error?.message || 'Token 验证失败';
+            return { success: false, message };
         } finally {
             isLoading.value = false;
         }
     }
 
-    async function login(newToken: string): Promise<boolean> {
+    async function login(newToken: string): Promise<{ success: boolean; message?: string }> {
         setToken(newToken);
         return await validateToken();
     }

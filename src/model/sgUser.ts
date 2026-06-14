@@ -1,6 +1,6 @@
 import { Model } from "sutando";
 import { inspect, InspectOptions } from "util";
-import { UserType } from "../constants";
+import { UserType, UserStatus } from "../constants";
 
 class SgUser extends Model {
     table = "user";
@@ -10,6 +10,7 @@ class SgUser extends Model {
     token!: string;
     type!: UserType;
     balance!: number;
+    status!: UserStatus;
 
     created_at!: Date;
     updated_at!: Date;

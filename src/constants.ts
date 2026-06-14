@@ -34,4 +34,9 @@ export enum UserType {
     ROOT = "root",
 }
 
+export enum UserStatus {
+    ACTIVE = "active",
+    DISABLED = "disabled",
+}
+
 export const ROOT_USER_ID = -1;

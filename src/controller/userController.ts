@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { SgUser } from "../model/sgUser";
-import { UserType } from "../constants";
+import { UserType, UserStatus } from "../constants";
 import userService from "../service/userService";
 import { createListResponse, parsePaginationQuery } from "../util/pagination";
 
@@ -73,6 +73,7 @@ async function createUser(c: Context) {
             token,
             type: type || UserType.NORMAL,
             balance: 0,
+            status: UserStatus.ACTIVE,
         });
 
         console.log("[userController] User created successfully:", instance);
@@ -101,7 +102,7 @@ async function updateUser(c: Context) {
     }
 
     const body = await c.req.json();
-    const { name, token } = body;
+    const { name, token, status } = body;
 
     const updateData: Record<string, unknown> = {};
     if (name !== undefined) {
@@ -109,6 +110,9 @@ async function updateUser(c: Context) {
     }
     if (token !== undefined) {
         updateData.token = token === null || token === "" ? crypto.randomUUID() : token;
+    }
+    if (status !== undefined) {
+        updateData.status = status;
     }
 
     if (Object.keys(updateData).length === 0) {

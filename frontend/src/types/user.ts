@@ -7,6 +7,7 @@ export interface User extends BaseEntity {
     token: string;
     type: UserType;
     balance: number;
+    status: 'active' | 'disabled';
 }
 
 export interface CreateUserRequest {
@@ -18,6 +19,7 @@ export interface CreateUserRequest {
 export interface UpdateUserRequest {
     name?: string;
     token?: string;
+    status?: 'active' | 'disabled';
 }
 
 export interface UserQuery extends TableQuery {

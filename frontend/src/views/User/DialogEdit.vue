@@ -24,16 +24,15 @@
                     un-checked-value="disabled"
                 />
             </a-form-item>
-            <a-form-item label="Token">
-                <div class="token-section">
-                    <TokenDisplay :token="formState.token" />
-                    <a-button
-                        type="link"
-                        @click="showRegenerateConfirm"
-                    >
-                        重新生成 Token
-                    </a-button>
-                </div>
+            <a-form-item label="Token" name="token" extra="留空保存时服务端会重新生成 Token；修改后旧 Token 将失效">
+                <a-input-password
+                    v-model:value="formState.token"
+                    placeholder="请输入 Token"
+                >
+                    <template #addonAfter>
+                        <a-button type="link" size="small" @click="showRegenerateConfirm">重新生成 Token</a-button>
+                    </template>
+                </a-input-password>
             </a-form-item>
         </a-form>
     </a-modal>
@@ -44,7 +43,6 @@ import { ref, reactive } from 'vue';
 import { Modal } from 'ant-design-vue/es';
 import type { FormInstance } from 'ant-design-vue/es';
 import { updateUser } from '@/api/user';
-import TokenDisplay from '@/components/common/TokenDisplay.vue';
 import type { User } from '@/types/user';
 import { notifyError, notifyRequestError, notifySuccess } from '@/utils/requestFeedback';
 
@@ -122,11 +120,3 @@ function handleCancel() {
 
 defineExpose({ open });
 </script>
-
-<style scoped>
-.token-section {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-</style>

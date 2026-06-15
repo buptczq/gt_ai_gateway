@@ -15,11 +15,15 @@
             <a-form-item label="用户名" name="name">
                 <a-input v-model:value="formState.name" placeholder="请输入用户名" />
             </a-form-item>
-            <a-form-item label="Token（可选）" name="token">
-                <a-input
+            <a-form-item label="Token（可选）" name="token" extra="留空则由服务端自动生成；填写后将使用该 Token">
+                <a-input-password
                     v-model:value="formState.token"
-                    placeholder="留空则自动生成"
-                />
+                    placeholder="请输入 Token"
+                >
+                    <template #addonAfter>
+                        <a-button type="link" size="small" @click="generateToken">生成 UUID</a-button>
+                    </template>
+                </a-input-password>
             </a-form-item>
             <a-form-item label="类型" name="type" tooltip="管理员才能登录后台，不会余额不足；普通用户只能通过 API 调用 LLM">
                 <a-select v-model:value="formState.type" placeholder="请选择用户类型">
@@ -59,6 +63,10 @@ const rules = {
 
 function open() {
     visible.value = true;
+}
+
+function generateToken() {
+    formState.token = crypto.randomUUID();
 }
 
 async function handleOk() {

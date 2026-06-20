@@ -49,3 +49,4 @@ data/
 # tauri build artifacts
 tauri/build/
 tauri/node_modules/
+tauri/src-tauri/gen/schemas/windows-schema.json

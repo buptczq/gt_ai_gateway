@@ -153,6 +153,7 @@ async function applyConfig(params: ApplyClientConfigParams): Promise<ClientConfi
         gatewayUrl: params.gatewayUrl.trim(),
         apiKey: params.apiKey.trim(),
         model: params.model?.trim() || "",
+        effortLevel: params.effortLevel?.trim(),
     });
     return await enrichStatus(status, adapter);
 }

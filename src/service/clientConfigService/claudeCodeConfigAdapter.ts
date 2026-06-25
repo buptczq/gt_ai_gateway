@@ -90,7 +90,17 @@ class ClaudeCodeConfigAdapter extends BaseConfigAdapter {
         };
 
         if (params.model.trim()) {
-            config.model = params.model.trim();
+            const model = params.model.trim();
+            config.model = model;
+            config.env.ANTHROPIC_MODEL = model;
+            config.env.ANTHROPIC_DEFAULT_OPUS_MODEL = model;
+            config.env.ANTHROPIC_DEFAULT_SONNET_MODEL = model;
+            config.env.ANTHROPIC_DEFAULT_HAIKU_MODEL = model;
+            config.env.CLAUDE_CODE_SUBAGENT_MODEL = model;
+        }
+
+        if (params.effortLevel?.trim()) {
+            config.env.CLAUDE_CODE_EFFORT_LEVEL = params.effortLevel.trim();
         }
 
         await this.writeConfigFile(`${JSON.stringify(config, null, 4)}\n`);

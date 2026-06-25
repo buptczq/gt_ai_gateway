@@ -193,9 +193,6 @@
         >
             <a-spin :spinning="dialogLoading">
                 <a-form layout="vertical" class="config-form">
-                    <a-form-item label="客户端">
-                        <a-input :value="selectedClient?.displayName || ''" disabled />
-                    </a-form-item>
 
                     <a-tabs
                         v-model:activeKey="configForm.connectionMode"
@@ -334,6 +331,20 @@
                             </a-form-item>
                         </a-tab-pane>
                     </a-tabs>
+                    <a-form-item
+                        v-if="configForm.client === ClientName.CLAUDE_CODE"
+                        label="思考强度"
+                    >
+                        <a-select
+                            v-model:value="configForm.effortLevel"
+                            placeholder="选择思考强度"
+                            allow-clear
+                        >
+                            <a-select-option value="low">低 (low)</a-select-option>
+                            <a-select-option value="medium">中 (medium)</a-select-option>
+                            <a-select-option value="high">高 (high)</a-select-option>
+                        </a-select>
+                    </a-form-item>
                 </a-form>
             </a-spin>
         </a-modal>
@@ -346,12 +357,7 @@
         >
             <a-empty v-if="!detailConfig" description="未检测到有效配置" />
             <a-form v-else layout="vertical" class="config-form readonly-config-form">
-                <a-form-item label="客户端">
-                    <a-input :value="detailClientName" disabled />
-                </a-form-item>
-                <a-form-item label="配置名称">
-                    <a-input :value="detailConfigName" disabled />
-                </a-form-item>
+
                 <a-tabs
                     :activeKey="detailConfig.connectionMode"
                     class="connection-tabs"
@@ -527,6 +533,7 @@ const configForm = reactive<{
     vendorId: number | null;
     model: string;
     upstreamModel: string;
+    effortLevel?: string;
 }>({
     client: '',
     connectionMode: 'gateway',
@@ -537,6 +544,7 @@ const configForm = reactive<{
     vendorId: null,
     model: '',
     upstreamModel: '',
+    effortLevel: undefined,
 });
 
 const renameForm = reactive<{
@@ -601,6 +609,7 @@ async function openConfigDialog(client: ClientConfigStatus): Promise<void> {
     configForm.vendorId = null;
     configForm.model = '';
     configForm.upstreamModel = '';
+    configForm.effortLevel = undefined;
     vendorModels.value = [];
     configDialogVisible.value = true;
 
@@ -731,6 +740,7 @@ function buildApplyRequest() {
             gatewayUrl: configForm.gatewayUrl,
             apiKey: user.token,
             model: configForm.model,
+            effortLevel: configForm.effortLevel,
         };
     }
 
@@ -757,6 +767,7 @@ function buildApplyRequest() {
         gatewayUrl: configForm.upstreamUrl,
         apiKey: vendor.token,
         model: configForm.upstreamModel,
+        effortLevel: configForm.effortLevel,
     };
 }
 

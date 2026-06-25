@@ -61,6 +61,7 @@ export interface ApplyClientConfigRequest {
     gatewayUrl: string;
     apiKey: string;
     model: string;
+    effortLevel?: string;
 }
 
 export interface CreateClientConfigBackupRequest {

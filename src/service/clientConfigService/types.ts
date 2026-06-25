@@ -12,6 +12,7 @@ interface ApplyClientConfigParams {
     gatewayUrl: string;
     apiKey: string;
     model: string;
+    effortLevel?: string;
 }
 
 interface RestoreClientConfigParams {

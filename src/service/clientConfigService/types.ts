@@ -25,6 +25,10 @@ interface DeleteClientConfigBackupParams {
     backupId: number;
 }
 
+interface UpdateClientConfigBackupParams extends CreateClientConfigParams {
+    backupId: number;
+}
+
 interface RenameClientConfigBackupParams {
     client: ClientName;
     backupId: number;
@@ -128,6 +132,7 @@ export type {
     GatewayUserInfo,
     PathApi,
     RenameClientConfigBackupParams,
+    UpdateClientConfigBackupParams,
 };
 
 export { ClientName };

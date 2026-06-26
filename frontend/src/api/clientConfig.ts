@@ -8,6 +8,7 @@ import type {
     CreateClientConfigRequest,
     DeleteClientConfigBackupRequest,
     RenameClientConfigBackupRequest,
+    UpdateClientConfigBackupRequest,
 } from '../types/clientConfig';
 
 export async function getClientConfigStatus(): Promise<ClientConfigStatusResponse> {
@@ -28,6 +29,10 @@ export async function createClientConfigBackup(data: CreateClientConfigBackupReq
 
 export async function renameClientConfigBackup(data: RenameClientConfigBackupRequest): Promise<ClientConfigBackupInfo> {
     return request.post('/client-config/backup/rename.json', data);
+}
+
+export async function updateClientConfigBackup(data: UpdateClientConfigBackupRequest): Promise<ClientConfigStatus> {
+    return request.post('/client-config/backup/update.json', data);
 }
 
 export async function deleteClientConfigBackup(data: DeleteClientConfigBackupRequest): Promise<ClientConfigStatus> {

@@ -143,6 +143,15 @@
                                                 size="small"
                                                 style="font-size: 13px;"
                                                 :disabled="!backup.config"
+                                                @click="openConfigDialog(client, backup)"
+                                            >
+                                                <EditOutlined />
+                                                修改
+                                            </a-button>
+                                            <a-button
+                                                size="small"
+                                                style="font-size: 13px;"
+                                                :disabled="!backup.config"
                                                 @click="openDetailDialog(client, backup.config, backup.name)"
                                             >
                                                 <InfoCircleOutlined />
@@ -482,6 +491,7 @@ import {
     deleteClientConfigBackup,
     getClientConfigStatus,
     renameClientConfigBackup,
+    updateClientConfigBackup,
 } from '@/api/clientConfig';
 import { ClientName } from '@/types/clientConfig';
 import type {
@@ -548,6 +558,8 @@ const configForm = reactive<{
     effortLevel: undefined,
 });
 
+const editingBackupId = ref<number | null>(null);
+
 const renameForm = reactive<{
     client: ClientName | '';
     backupId: number | null;
@@ -599,37 +611,75 @@ watch(clients, (items) => {
     }
 });
 
-async function openConfigDialog(client: ClientConfigStatus): Promise<void> {
+async function openConfigDialog(client: ClientConfigStatus, backup?: ClientConfigBackupInfo): Promise<void> {
     selectedClient.value = client;
+    editingBackupId.value = backup?.id || null;
     configForm.client = client.client;
-    configForm.connectionMode = 'gateway';
-    configForm.protocol = protocolByClient[client.client];
-    configForm.gatewayUrl = getDefaultGatewayUrl();
-    configForm.upstreamUrl = '';
-    configForm.userId = null;
-    configForm.vendorId = null;
-    configForm.model = '';
-    configForm.upstreamModel = '';
-    configForm.effortLevel = undefined;
-    vendorModels.value = [];
     configDialogVisible.value = true;
 
     await loadDialogOptions();
 
-    const activeUser = users.value.find(user => user.status === 'active');
-    if (activeUser) {
-        configForm.userId = activeUser.id;
-    }
+    if (backup && backup.config) {
+        configForm.connectionMode = backup.config.connectionMode;
+        configForm.protocol = backup.config.protocol || protocolByClient[client.client];
+        configForm.effortLevel = backup.config.effortLevel;
 
-    const firstModel = enabledModels.value[0];
-    if (firstModel) {
-        configForm.model = firstModel.name;
-    }
+        if (backup.config.connectionMode === 'gateway') {
+            configForm.gatewayUrl = backup.config.backendUrl;
+            configForm.model = backup.config.model;
+            if (backup.config.gatewayUser) {
+                const userId = backup.config.gatewayUser.id;
+                if (users.value.some(u => u.id === userId)) {
+                    configForm.userId = userId;
+                } else {
+                    configForm.userId = null;
+                }
+            } else {
+                // Fallback to token parsing if gatewayUser is not set (for older configs)
+                const tokenStr = backup.config.token || '';
+                const match = tokenStr.match(/^u-(\d+)-/);
+                if (match && match[1]) {
+                    const userId = parseInt(match[1], 10);
+                    if (users.value.some(u => u.id === userId)) {
+                        configForm.userId = userId;
+                    } else {
+                        configForm.userId = null;
+                    }
+                } else {
+                    configForm.userId = null;
+                }
+            }
+        } else {
+            configForm.upstreamUrl = backup.config.backendUrl;
+            configForm.upstreamModel = backup.config.model;
+            configForm.vendorId = null;
+        }
+    } else {
+        configForm.connectionMode = 'gateway';
+        configForm.protocol = protocolByClient[client.client];
+        configForm.gatewayUrl = getDefaultGatewayUrl();
+        configForm.upstreamUrl = '';
+        configForm.userId = null;
+        configForm.vendorId = null;
+        configForm.model = '';
+        configForm.upstreamModel = '';
+        configForm.effortLevel = undefined;
 
-    const firstVendor = vendors.value[0];
-    if (firstVendor) {
-        configForm.vendorId = firstVendor.id;
-        await updateVendorDefaults();
+        const activeUser = users.value.find(user => user.status === 'active');
+        if (activeUser) {
+            configForm.userId = activeUser.id;
+        }
+
+        const firstModel = enabledModels.value[0];
+        if (firstModel) {
+            configForm.model = firstModel.name;
+        }
+
+        const firstVendor = vendors.value[0];
+        if (firstVendor) {
+            configForm.vendorId = firstVendor.id;
+            await updateVendorDefaults();
+        }
     }
 }
 
@@ -682,12 +732,18 @@ async function submitConfig(): Promise<void> {
 
     savingClient.value = configForm.client;
     try {
-        const status = await createClientConfig(request);
+        let status: ClientConfigStatus;
+        if (editingBackupId.value !== null) {
+            status = await updateClientConfigBackup({ ...request, backupId: editingBackupId.value });
+        } else {
+            status = await createClientConfig(request);
+        }
         updateClientStatus(status);
         configDialogVisible.value = false;
-        message.success(`${status.displayName} 配置已创建`);
+        message.success(editingBackupId.value !== null ? '配置已修改' : `${status.displayName} 配置已创建`);
     } finally {
         savingClient.value = '';
+        editingBackupId.value = null;
     }
 }
 

@@ -258,6 +258,51 @@ async function renameBackup(params: RenameClientConfigBackupParams): Promise<Cli
 }
 
 
+async function updateBackupConfig(params: UpdateClientConfigBackupParams): Promise<ClientConfigStatus> {
+    if (ormService.isWorker) {
+        throw new Error("客户端管理需要读写本机配置文件，请本地安装后使用。");
+    }
+
+    if (!params.gatewayUrl?.trim()) {
+        throw new Error("Gateway URL is required");
+    }
+
+    if (!params.apiKey?.trim()) {
+        throw new Error("API key is required");
+    }
+
+    const adapter = await getAdapter(params.client);
+    const backup = await SgClientConfigBackup.query()
+        .where("id", params.backupId)
+        .where("client", params.client)
+        .first();
+
+    if (!backup) {
+        throw new Error("Backup not found");
+    }
+
+    const configContent = await adapter.buildConfigContent({
+        ...params,
+        connectionMode: params.connectionMode || "gateway",
+        protocol: params.protocol,
+        gatewayUrl: params.gatewayUrl.trim(),
+        apiKey: params.apiKey.trim(),
+        model: params.model?.trim() || "",
+        effortLevel: params.effortLevel?.trim(),
+    });
+
+    await backup.update({ configContent });
+    backup.configContent = configContent;
+
+    if (backup.enabled) {
+        // If the backup being updated is currently enabled, apply changes to local config immediately
+        await adapter.restore(backup.configContent);
+    }
+
+    return await enrichStatus(await adapter.getStatus(), adapter);
+}
+
+
 async function deleteBackup(params: DeleteClientConfigBackupParams): Promise<ClientConfigStatus> {
     if (ormService.isWorker) {
         throw new Error("客户端管理需要读写本机配置文件，请本地安装后使用。");
@@ -315,6 +360,7 @@ export default {
     getStatus,
     applyConfig,
     renameBackup,
+    updateBackupConfig,
 };
 
 export type {

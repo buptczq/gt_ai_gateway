@@ -91,6 +91,7 @@ app.post("/client-config/create.json", authMiddleware.requireAdmin, clientConfig
 app.post("/client-config/backup.json", authMiddleware.requireAdmin, clientConfigController.backup);
 app.post("/client-config/backup/rename.json", authMiddleware.requireAdmin, clientConfigController.renameBackup);
 app.post("/client-config/backup/delete.json", authMiddleware.requireAdmin, clientConfigController.deleteBackup);
+app.post("/client-config/backup/update.json", authMiddleware.requireAdmin, clientConfigController.updateBackup);
 app.post("/client-config/apply.json", authMiddleware.requireAdmin, clientConfigController.apply);
 
 // Vendor (需要管理员权限)

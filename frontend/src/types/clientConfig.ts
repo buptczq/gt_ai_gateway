@@ -32,6 +32,7 @@ export interface CurrentClientConfig {
     model: string;
     protocol: ClientProtocol;
     gatewayUser: GatewayUserInfo | null;
+    effortLevel?: string;
 }
 
 export interface GatewayUserInfo {
@@ -81,6 +82,10 @@ export interface RenameClientConfigBackupRequest {
 
 export interface DeleteClientConfigBackupRequest {
     client: ClientName;
+    backupId: number;
+}
+
+export interface UpdateClientConfigBackupRequest extends CreateClientConfigRequest {
     backupId: number;
 }
 

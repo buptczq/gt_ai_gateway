@@ -36,6 +36,10 @@ async function apply(c: Context) {
     return c.json(await clientConfigService.applyConfig(body));
 }
 
+async function updateBackup(c: Context) {
+    const body = await c.req.json();
+    return c.json(await clientConfigService.updateBackupConfig(body));
+}
 
 export default {
     backup,
@@ -44,4 +48,5 @@ export default {
     renameBackup,
     status,
     apply,
+    updateBackup,
 };

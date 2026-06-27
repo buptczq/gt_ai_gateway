@@ -93,7 +93,7 @@
                                         <div class="config-row-content">
                                             <div class="config-row-name config-row-name-with-action">
                                                 <span>{{ backup.name }}</span>
-                                                <a-tag v-if="backup.enabled" color="blue" class="current-config-tag">启用</a-tag>
+
                                                 <a-tag
                                                     v-if="backup.enabled && client.activeConfigModified"
                                                     color="warning"

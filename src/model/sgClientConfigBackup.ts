@@ -3,7 +3,17 @@ import { inspect, InspectOptions } from "util";
 import { ClientName } from "../constants";
 
 
-import { ClientConfigFields } from "../service/clientConfigService/types";
+type ConnectionMode = "gateway" | "vendor";
+type ClientProtocol = "anthropic" | "responses";
+
+interface ClientConfigFields {
+    connectionMode?: ConnectionMode;
+    protocol?: ClientProtocol;
+    gatewayUrl: string;
+    apiKey: string;
+    model: string;
+    effortLevel?: string;
+}
 
 type ClientConfigContent = ClientConfigFields | Record<string, string>;
 
@@ -32,4 +42,4 @@ class SgClientConfigBackup extends Model {
 
 
 export default SgClientConfigBackup;
-export type { ClientConfigContent };
+export type { ClientConfigContent, ClientConfigFields, ConnectionMode, ClientProtocol };

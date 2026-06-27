@@ -13,6 +13,7 @@ import type {
     FileSystemApi,
     PathApi,
     RenameClientConfigBackupParams,
+    UpdateClientConfigBackupParams,
     AdapterConfigStatus,
     ClientConfigFields,
     CurrentClientConfigWithUser,
@@ -122,10 +123,9 @@ async function toBackupInfo(record: SgClientConfigBackup, adapter: ConfigAdapter
         client: record.client as ClientName,
         name: record.name,
         fileCount: 1, // simplified since we just store fields now
-        createdAt: String(record.created_at || record.createdAt || ""),
+        createdAt: String(record.created_at || ""),
         enabled: isEnabled(record.enabled),
         config: await enrichGatewayUser(parsedConfig),
-        configContent: rawContent,
     };
 }
 

@@ -1,18 +1,5 @@
 import { ClientName } from "../../constants";
-import type { ClientConfigContent } from "../../model/sgClientConfigBackup";
-
-
-type ConnectionMode = "gateway" | "vendor";
-type ClientProtocol = "anthropic" | "responses";
-
-interface ClientConfigFields {
-    connectionMode?: ConnectionMode;
-    protocol?: ClientProtocol;
-    gatewayUrl: string;
-    apiKey: string;
-    model: string;
-    effortLevel?: string;
-}
+import type { ClientConfigContent, ClientConfigFields, ConnectionMode, ClientProtocol } from "../../model/sgClientConfigBackup";
 
 interface CreateClientConfigParams extends ClientConfigFields {
     client: ClientName;
@@ -109,18 +96,20 @@ interface PathApi {
     join(...paths: string[]): string;
 }
 
+type ClientConfigFileSystemContent = Record<string, string>;
+
 interface ConfigAdapter {
     readonly client: ClientName;
     readonly displayName: string;
-    readonly defaultGatewaySuffix: string;
     readonly configPath: string;
     readonly configPaths: string[];
+    readonly defaultGatewaySuffix: string;
 
     isInstalled(): Promise<boolean>;
-    readConfig(): Promise<ClientConfigContent>;
-    writeConfig(content: ClientConfigContent): Promise<void>;
-    patchConfigContent(content: ClientConfigContent, fields: ClientConfigFields): ClientConfigContent;
-    parseConfigContent(content: ClientConfigContent): ClientConfigFields | null;
+    readConfig(): Promise<ClientConfigFileSystemContent>;
+    writeConfig(content: ClientConfigFileSystemContent): Promise<void>;
+    parseConfigContent(configContent: ClientConfigFileSystemContent): ClientConfigFields | null;
+    patchConfigContent(content: ClientConfigFileSystemContent, fields: ClientConfigFields): ClientConfigFileSystemContent;
 }
 
 export type {
@@ -131,6 +120,7 @@ export type {
     ClientConfigFields,
     ClientConfigStatus,
     ClientConfigStatusResponse,
+    ClientConfigFileSystemContent,
     ClientProtocol,
     ConfigAdapter,
     ConnectionMode,

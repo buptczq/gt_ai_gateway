@@ -5,7 +5,7 @@ import { tmpdir } from "os";
 import clientConfigService from "../../src/service/clientConfigService/core";
 import ormService from "../../src/service/ormService";
 import SgClientConfigBackup from "../../src/model/sgClientConfigBackup";
-import { ClientName } from "../../src/constants";
+import { ClientName, ConnectionMode } from "../../src/constants";
 
 
 describe("clientConfigService", () => {
@@ -207,7 +207,7 @@ describe("clientConfigService", () => {
 
         const status = await clientConfigService.createConfig({
             client: ClientName.CLAUDE_CODE,
-            connectionMode: "vendor",
+            connectionMode: ConnectionMode.VENDOR,
             gatewayUrl: "https://api.anthropic.com/v1/messages",
             apiKey: "vendor-token",
             model: "claude-sonnet",
@@ -227,7 +227,7 @@ describe("clientConfigService", () => {
 
         const status = await clientConfigService.createConfig({
             client: ClientName.CODEX,
-            connectionMode: "vendor",
+            connectionMode: ConnectionMode.VENDOR,
             gatewayUrl: "https://api.openai.com/v1/chat/completions",
             apiKey: "vendor-token",
             model: "gpt-5",

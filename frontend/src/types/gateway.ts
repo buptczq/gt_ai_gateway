@@ -1,4 +1,10 @@
-export type ApiFormat = 'openai' | 'anthropic';
+export const ApiFormat = {
+    OPENAI: 'openai',
+    ANTHROPIC: 'anthropic',
+    RESPONSES: 'responses',
+} as const;
+
+export type ApiFormat = typeof ApiFormat[keyof typeof ApiFormat];
 
 export interface TestMessage {
     role: 'system' | 'user' | 'assistant';

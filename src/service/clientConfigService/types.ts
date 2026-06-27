@@ -1,5 +1,5 @@
-import { ClientName } from "../../constants";
-import type { ClientConfigContent, ClientConfigFields, ConnectionMode, ClientProtocol } from "../../model/sgClientConfigBackup";
+import { ClientName, ConnectionMode, ApiFormat } from "../../constants";
+import type { ClientConfigContent, ClientConfigFields } from "../../model/sgClientConfigBackup";
 
 interface CreateClientConfigParams extends ClientConfigFields {
     client: ClientName;
@@ -40,7 +40,7 @@ interface ClientConfigStatusResponse {
 interface AdapterConfigStatus {
     client: ClientName;
     displayName: string;
-    protocol: ClientProtocol;
+    protocol: ApiFormat;
     installed: boolean;
     configured: boolean;
     currentConfig: ClientConfigFields | null;
@@ -102,7 +102,7 @@ type ClientConfigFileSystemContent = Record<string, string>;
 interface ConfigAdapter {
     readonly client: ClientName;
     readonly displayName: string;
-    readonly protocol: ClientProtocol;
+    readonly protocol: ApiFormat;
     readonly configPath: string;
     readonly configPaths: string[];
     readonly defaultGatewaySuffix: string;
@@ -123,7 +123,7 @@ export type {
     ClientConfigStatus,
     ClientConfigStatusResponse,
     ClientConfigFileSystemContent,
-    ClientProtocol,
+    ApiFormat,
     ConfigAdapter,
     ConnectionMode,
     CreateClientConfigBackupParams,

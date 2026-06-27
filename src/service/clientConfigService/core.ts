@@ -1,11 +1,11 @@
 import ormService from "../ormService";
 import SgClientConfigBackup from "../../model/sgClientConfigBackup";
+import { ClientName, ConnectionMode } from "../../constants";
 import type {
     ApplyClientConfigParams,
     ClientConfigBackupInfo,
     ClientConfigStatus,
     ClientConfigStatusResponse,
-    ClientName,
     ConfigAdapter,
     CreateClientConfigBackupParams,
     CreateClientConfigParams,
@@ -238,7 +238,7 @@ async function createConfig(params: CreateClientConfigParams): Promise<ClientCon
     const adapter = await getAdapter(params.client);
     const existingContent = await adapter.readConfig();
     const fields: ClientConfigFields = {
-        connectionMode: params.connectionMode || "gateway",
+        connectionMode: params.connectionMode || ConnectionMode.GATEWAY,
         gatewayUrl: params.gatewayUrl.trim(),
         apiKey: params.apiKey.trim(),
         model: params.model?.trim() || "",
@@ -330,7 +330,7 @@ async function updateBackupConfig(params: UpdateClientConfigBackupParams): Promi
     }
 
     const fields: ClientConfigFields = {
-        connectionMode: params.connectionMode || "gateway",
+        connectionMode: params.connectionMode || ConnectionMode.GATEWAY,
         gatewayUrl: params.gatewayUrl.trim(),
         apiKey: params.apiKey.trim(),
         model: params.model?.trim() || "",

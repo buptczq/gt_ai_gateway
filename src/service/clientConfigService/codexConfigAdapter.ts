@@ -1,13 +1,13 @@
-import type { ClientConfigFileSystemContent, ClientConfigFields, ClientProtocol, FileSystemApi, PathApi } from "./types";
+import type { ClientConfigFileSystemContent, ClientConfigFields, FileSystemApi, PathApi } from "./types";
 import BaseConfigAdapter from "./baseConfigAdapter";
 import configAdapterUtils from "./configAdapterUtils";
 import tomlUtil from "../../util/tomlUtil";
-import { ClientName } from "../../constants";
+import { ClientName, ConnectionMode, ApiFormat } from "../../constants";
 
 
 class CodexConfigAdapter extends BaseConfigAdapter {
     readonly authPath: string;
-    readonly protocol: ClientProtocol = "responses";
+    readonly protocol: ApiFormat = ApiFormat.RESPONSES;
     readonly defaultGatewaySuffix = "/llm/v1";
 
     constructor(fs: FileSystemApi, path: PathApi, homeDir: string) {
@@ -25,7 +25,7 @@ class CodexConfigAdapter extends BaseConfigAdapter {
 
     private buildBaseUrl(fields: ClientConfigFields): string {
         const url = fields.gatewayUrl.replace(/\/+$/, "");
-        if ((fields.connectionMode || "gateway") === "vendor") {
+        if ((fields.connectionMode || ConnectionMode.GATEWAY) === ConnectionMode.VENDOR) {
             return url
                 .replace(/\/responses\/?$/, "")
                 .replace(/\/chat\/completions\/?$/, "");
@@ -51,7 +51,7 @@ class CodexConfigAdapter extends BaseConfigAdapter {
         }
 
         return {
-            connectionMode: this.isGatewayUrl(backendUrl) ? "gateway" : "vendor",
+            connectionMode: this.isGatewayUrl(backendUrl) ? ConnectionMode.GATEWAY : ConnectionMode.VENDOR,
             gatewayUrl: backendUrl,
             apiKey: token,
             model: tomlUtil.getTomlValue(content, "model") || "",

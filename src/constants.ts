@@ -33,6 +33,11 @@ export enum ClientName {
     CODEX = "codex",
 }
 
+export enum ConnectionMode {
+    GATEWAY = "gateway",
+    VENDOR = "vendor",
+}
+
 export enum UserType {
     NORMAL = "normal",
     ADMIN = "admin",

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { sendApiTest } from '@/api/gateway';
-import type { ApiTestRequest, ApiTestHistory, ApiTestState } from '@/types/gateway';
+import { ApiFormat, type ApiTestRequest, type ApiTestHistory, type ApiTestState } from '@/types/gateway';
 import { toAppRequestError } from '@/utils/requestError';
 
 const MAX_HISTORY_COUNT = 50;
@@ -16,7 +16,7 @@ export const useApiTestStore = defineStore('apiTest', () => {
 
     // 当前配置状态
     const config = ref<ApiTestState>({
-        format: 'openai',
+        format: ApiFormat.OPENAI,
         model: '',
         messages: [{ role: 'user', content: '' }],
         temperature: 0.7,

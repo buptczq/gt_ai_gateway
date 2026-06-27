@@ -1,11 +1,11 @@
-import type { ClientConfigFileSystemContent, ClientConfigFields, ClientProtocol, FileSystemApi, PathApi } from "./types";
+import type { ClientConfigFileSystemContent, ClientConfigFields, FileSystemApi, PathApi } from "./types";
 import BaseConfigAdapter from "./baseConfigAdapter";
 import configAdapterUtils from "./configAdapterUtils";
-import { ClientName } from "../../constants";
+import { ClientName, ConnectionMode, ApiFormat } from "../../constants";
 
 
 class ClaudeCodeConfigAdapter extends BaseConfigAdapter {
-    readonly protocol: ClientProtocol = "anthropic";
+    readonly protocol: ApiFormat = ApiFormat.ANTHROPIC;
     readonly defaultGatewaySuffix = "/llm";
 
     constructor(fs: FileSystemApi, path: PathApi, homeDir: string) {
@@ -14,7 +14,7 @@ class ClaudeCodeConfigAdapter extends BaseConfigAdapter {
 
     private buildBaseUrl(fields: ClientConfigFields): string {
         const url = fields.gatewayUrl.replace(/\/+$/, "");
-        if ((fields.connectionMode || "gateway") === "vendor") {
+        if ((fields.connectionMode || ConnectionMode.GATEWAY) === ConnectionMode.VENDOR) {
             return url
                 .replace(/\/v1\/messages\/?$/, "")
                 .replace(/\/v1\/?$/, "");
@@ -39,7 +39,7 @@ class ClaudeCodeConfigAdapter extends BaseConfigAdapter {
         }
 
         return {
-            connectionMode: this.isGatewayUrl(config.env?.ANTHROPIC_BASE_URL) ? "gateway" : "vendor", // Accurate deduction by host and port
+            connectionMode: this.isGatewayUrl(config.env?.ANTHROPIC_BASE_URL) ? ConnectionMode.GATEWAY : ConnectionMode.VENDOR, // Accurate deduction by host and port
             gatewayUrl: backendUrl,
             apiKey: token,
             model: config.env?.ANTHROPIC_MODEL || config.env?.CLAUDE_CODE_SUBAGENT_MODEL || config.model || "",

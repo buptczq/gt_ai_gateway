@@ -1,3 +1,5 @@
+import type { ApiFormat } from './gateway';
+
 export const ClientName = {
     CLAUDE_CODE: 'claude-code',
     CODEX: 'codex',
@@ -5,13 +7,17 @@ export const ClientName = {
 
 export type ClientName = typeof ClientName[keyof typeof ClientName];
 
-export type ClientConnectionMode = 'gateway' | 'vendor';
-export type ClientProtocol = 'anthropic' | 'responses';
+export const ClientConnectionMode = {
+    GATEWAY: 'gateway',
+    VENDOR: 'vendor',
+} as const;
+
+export type ClientConnectionMode = typeof ClientConnectionMode[keyof typeof ClientConnectionMode];
 
 export interface ClientConfigStatus {
     client: ClientName;
     displayName: string;
-    protocol: ClientProtocol;
+    protocol: ApiFormat;
     installed: boolean;
     configured: boolean;
     backupExists: boolean;

@@ -1,10 +1,6 @@
 import { Model } from "sutando";
 import { inspect, InspectOptions } from "util";
-import { ClientName } from "../constants";
-
-
-type ConnectionMode = "gateway" | "vendor";
-type ClientProtocol = "anthropic" | "responses";
+import { ClientName, ConnectionMode, ApiFormat } from "../constants";
 
 interface ClientConfigFields {
     connectionMode?: ConnectionMode;
@@ -41,4 +37,4 @@ class SgClientConfigBackup extends Model {
 
 
 export default SgClientConfigBackup;
-export type { ClientConfigContent, ClientConfigFields, ConnectionMode, ClientProtocol };
+export type { ClientConfigContent, ClientConfigFields, ConnectionMode, ApiFormat };

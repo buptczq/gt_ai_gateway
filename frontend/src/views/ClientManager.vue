@@ -218,7 +218,7 @@
                         class="connection-tabs"
                         @change="handleConnectionModeChange"
                     >
-                        <a-tab-pane key="gateway" tab="通过 GT AI Gateway">
+                        <a-tab-pane :key="ClientConnectionMode.GATEWAY" tab="通过 GT AI Gateway">
                             <a-form-item label="协议">
                                 <a-input :value="selectedProtocolLabel" disabled />
                             </a-form-item>
@@ -288,7 +288,7 @@
                             </a-form-item>
                         </a-tab-pane>
 
-                        <a-tab-pane key="vendor" tab="直连上游供应商">
+                        <a-tab-pane :key="ClientConnectionMode.VENDOR" tab="直连上游供应商">
                             <a-form-item label="协议">
                                 <a-input :value="selectedProtocolLabel" disabled />
                             </a-form-item>
@@ -381,9 +381,9 @@
                     :activeKey="detailConfig.connectionMode"
                     class="connection-tabs"
                 >
-                    <a-tab-pane key="gateway" tab="通过 GT AI Gateway" :disabled="detailConfig.connectionMode !== 'gateway'">
+                    <a-tab-pane :key="ClientConnectionMode.GATEWAY" tab="通过 GT AI Gateway" :disabled="detailConfig.connectionMode !== ClientConnectionMode.GATEWAY">
                         <a-form-item label="协议">
-                            <a-input :value="getProtocolLabel(detailConfig.protocol)" disabled />
+                            <a-input :value="selectedProtocolLabel" disabled />
                         </a-form-item>
                         <a-form-item label="服务端地址">
                             <a-input :value="detailConfig.gatewayUrl" disabled />
@@ -426,12 +426,12 @@
                         </a-form-item>
                     </a-tab-pane>
 
-                    <a-tab-pane key="vendor" tab="直连上游供应商" :disabled="detailConfig.connectionMode !== 'vendor'">
+                    <a-tab-pane :key="ClientConnectionMode.VENDOR" tab="直连上游供应商" :disabled="detailConfig.connectionMode !== ClientConnectionMode.VENDOR">
                         <a-form-item label="协议">
-                            <a-input :value="getProtocolLabel(detailConfig.protocol)" disabled />
+                            <a-input :value="selectedProtocolLabel" disabled />
                         </a-form-item>
                         <a-form-item label="供应商">
-                            <a-select :value="findVendorByUrl(detailConfig.gatewayUrl, detailConfig.protocol)?.id" disabled class="readonly-select">
+                            <a-select :value="findVendorByUrl(detailConfig.gatewayUrl, selectedClient?.protocol)?.id" disabled class="readonly-select">
                                 <a-select-option
                                     v-for="vendor in vendors"
                                     :key="vendor.id"
@@ -504,12 +504,11 @@ import {
     renameClientConfigBackup,
     updateClientConfigBackup,
 } from '@/api/clientConfig';
-import { ClientName } from '@/types/clientConfig';
+import { ClientName, ClientConnectionMode } from '@/types/clientConfig';
+import { ApiFormat } from '@/types/gateway';
 import type {
     ClientConfigBackupInfo,
     ClientConfigStatus,
-    ClientConnectionMode,
-    ClientProtocol,
     CurrentClientConfig,
 } from '@/types/clientConfig';
 import { getBaseURL } from '@/utils/request';
@@ -548,7 +547,7 @@ const detailConfigName = ref('');
 const configForm = reactive<{
     client: ClientName | '';
     connectionMode: ClientConnectionMode;
-    protocol: ClientProtocol;
+    protocol: ApiFormat;
     gatewayUrl: string;
     upstreamUrl: string;
     userId: number | null;
@@ -558,8 +557,8 @@ const configForm = reactive<{
     effortLevel?: string;
 }>({
     client: '',
-    connectionMode: 'gateway',
-    protocol: 'anthropic',
+    connectionMode: ClientConnectionMode.GATEWAY,
+    protocol: ApiFormat.ANTHROPIC,
     gatewayUrl: '',
     upstreamUrl: '',
     userId: null,
@@ -632,7 +631,7 @@ async function openConfigDialog(client: ClientConfigStatus, backup?: ClientConfi
         configForm.protocol = client.protocol;
         configForm.effortLevel = backup.config.effortLevel;
 
-        if (backup.config.connectionMode === 'gateway') {
+        if (backup.config.connectionMode === ClientConnectionMode.GATEWAY) {
             configForm.gatewayUrl = backup.config.gatewayUrl;
             configForm.model = backup.config.model;
             if (backup.config.gatewayUser) {
@@ -663,7 +662,7 @@ async function openConfigDialog(client: ClientConfigStatus, backup?: ClientConfi
             configForm.vendorId = null;
         }
     } else {
-        configForm.connectionMode = 'gateway';
+        configForm.connectionMode = ClientConnectionMode.GATEWAY;
         configForm.protocol = client.protocol;
         configForm.gatewayUrl = getDefaultGatewayUrl(client);
         configForm.upstreamUrl = '';
@@ -785,7 +784,7 @@ function confirmInitialBackup(client: ClientConfigStatus): Promise<boolean> {
 function buildApplyRequest() {
     if (!configForm.client) return null;
 
-    if (configForm.connectionMode === 'gateway') {
+    if (configForm.connectionMode === ClientConnectionMode.GATEWAY) {
         const user = users.value.find(item => item.id === configForm.userId);
         if (!user) {
             message.error('请选择用户');
@@ -804,7 +803,7 @@ function buildApplyRequest() {
 
         return {
             client: configForm.client,
-            connectionMode: 'gateway' as const,
+            connectionMode: ClientConnectionMode.GATEWAY,
             gatewayUrl: configForm.gatewayUrl,
             apiKey: user.token,
             model: configForm.model,
@@ -830,7 +829,7 @@ function buildApplyRequest() {
 
     return {
         client: configForm.client,
-        connectionMode: 'vendor' as const,
+        connectionMode: ClientConnectionMode.VENDOR,
         gatewayUrl: configForm.upstreamUrl,
         apiKey: vendor.token,
         model: configForm.upstreamModel,
@@ -844,7 +843,7 @@ function filterSelectOption(input: string, option: any): boolean {
 
 async function handleConnectionModeChange(mode: string): Promise<void> {
     configForm.connectionMode = mode as ClientConnectionMode;
-    if (configForm.connectionMode === 'vendor') {
+    if (configForm.connectionMode === ClientConnectionMode.VENDOR) {
         await updateVendorDefaults();
     }
 }
@@ -871,11 +870,11 @@ async function loadSelectedVendorModels(vendorId: number): Promise<void> {
     configForm.upstreamModel = vendorModels.value[0]?.model_id || '';
 }
 
-function getVendorUrl(vendor: Vendor, protocol: ClientProtocol): string {
+function getVendorUrl(vendor: Vendor, protocol: ApiFormat): string {
     const presetUrls = vendorPresetUrls.value[vendor.type] || {};
     const urls = { ...presetUrls, ...vendor.urls };
 
-    if (protocol === 'responses') {
+    if (protocol === ApiFormat.RESPONSES) {
         return urls.responses || urls.openai || '';
     }
 
@@ -886,8 +885,8 @@ function findUser(id: number): User | undefined {
     return users.value.find(user => user.id === id);
 }
 
-function findVendorByUrl(url: string, protocol: ClientProtocol): Vendor | undefined {
-    if (!url) return undefined;
+function findVendorByUrl(url: string, protocol?: ApiFormat): Vendor | undefined {
+    if (!url || !protocol) return undefined;
     return vendors.value.find(vendor => {
         const vendorUrl = getVendorUrl(vendor, protocol);
         return vendorUrl && url.startsWith(vendorUrl);
@@ -911,26 +910,22 @@ function getUserTypeColor(type?: UserType): string {
 }
 
 function getConnectionModeLabel(mode?: ClientConnectionMode): string {
-    if (mode === 'gateway') return '代理模式';
-    if (mode === 'vendor') return '直连模式';
+    if (mode === ClientConnectionMode.GATEWAY) return '代理模式';
+    if (mode === ClientConnectionMode.VENDOR) return '直连模式';
     return '未配置';
 }
 
 function getConnectionModeColor(mode?: ClientConnectionMode): string {
-    if (mode === 'gateway') return 'blue';
-    if (mode === 'vendor') return 'green';
+    if (mode === ClientConnectionMode.GATEWAY) return 'blue';
+    if (mode === ClientConnectionMode.VENDOR) return 'green';
     return 'default';
 }
 
 function isGatewayConfig(config?: CurrentClientConfig | null): boolean {
-    return config?.connectionMode === 'gateway';
+    return config?.connectionMode === ClientConnectionMode.GATEWAY;
 }
 
-function getProtocolLabel(protocol?: ClientProtocol): string {
-    if (protocol === 'anthropic') return 'Anthropic';
-    if (protocol === 'responses') return 'OpenAI Responses';
-    return '';
-}
+
 
 function getVendorTypeLabel(type?: VendorType): string {
     if (!type) return '';

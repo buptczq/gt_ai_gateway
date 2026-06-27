@@ -127,9 +127,21 @@
                                                     <span class="model-text">{{ backup.config.model }}</span>
                                                 </div>
                                                 <div class="config-flow">
-                                                    <a-tag :color="getConnectionModeColor(backup.config.connectionMode)" class="merged-mode-tag">
-                                                        {{ getConnectionModeLabel(backup.config.connectionMode) }}
-                                                    </a-tag>
+                                                    <a-tooltip>
+                                                        <template #title>
+                                                            <div v-if="backup.config.connectionMode === ClientConnectionMode.GATEWAY">
+                                                                客户端通过 GtAIGateway 连接上游。<br/>
+                                                                支持高级功能，如抓取请求流量进行分析、自动协议转换、提升缓存命中率等。
+                                                            </div>
+                                                            <div v-else>
+                                                                客户端直接连接上游供应商，不经过 GtAIGateway 代理。
+                                                            </div>
+                                                        </template>
+                                                        <a-tag :color="getConnectionModeColor(backup.config.connectionMode)" class="merged-mode-tag" style="cursor: help;">
+                                                            {{ getConnectionModeLabel(backup.config.connectionMode) }}
+                                                            <InfoCircleOutlined style="margin-left: 2px;" />
+                                                        </a-tag>
+                                                    </a-tooltip>
                                                     <template v-if="isGatewayConfig(backup.config)">
                                                         <span>🤖</span>
                                                         <ArrowRightOutlined class="flow-arrow" />
@@ -218,7 +230,19 @@
                         class="connection-tabs"
                         @change="handleConnectionModeChange"
                     >
-                        <a-tab-pane :key="ClientConnectionMode.GATEWAY" tab="通过 GT AI Gateway">
+                        <a-tab-pane :key="ClientConnectionMode.GATEWAY">
+                            <template #tab>
+                                <span>
+                                    通过 GT AI Gateway
+                                    <a-tooltip>
+                                        <template #title>
+                                            <div>代理模式：客户端通过 GtAIGateway 连接上游。</div>
+                                            <div>支持高级功能，如抓取请求流量进行分析、自动协议转换、提升缓存命中率等。</div>
+                                        </template>
+                                        <InfoCircleOutlined class="label-help-icon" style="margin-left: 4px;" />
+                                    </a-tooltip>
+                                </span>
+                            </template>
                             <a-form-item label="协议">
                                 <a-input :value="selectedProtocolLabel" disabled />
                             </a-form-item>
@@ -288,7 +312,15 @@
                             </a-form-item>
                         </a-tab-pane>
 
-                        <a-tab-pane :key="ClientConnectionMode.VENDOR" tab="直连上游供应商">
+                        <a-tab-pane :key="ClientConnectionMode.VENDOR">
+                            <template #tab>
+                                <span>
+                                    直连上游供应商
+                                    <a-tooltip title="直连模式：客户端直接连接上游供应商，不经过 GtAIGateway 代理。">
+                                        <InfoCircleOutlined class="label-help-icon" style="margin-left: 4px;" />
+                                    </a-tooltip>
+                                </span>
+                            </template>
                             <a-form-item label="协议">
                                 <a-input :value="selectedProtocolLabel" disabled />
                             </a-form-item>
@@ -381,7 +413,19 @@
                     :activeKey="detailConfig.connectionMode"
                     class="connection-tabs"
                 >
-                    <a-tab-pane :key="ClientConnectionMode.GATEWAY" tab="通过 GT AI Gateway" :disabled="detailConfig.connectionMode !== ClientConnectionMode.GATEWAY">
+                    <a-tab-pane :key="ClientConnectionMode.GATEWAY" :disabled="detailConfig.connectionMode !== ClientConnectionMode.GATEWAY">
+                        <template #tab>
+                            <span>
+                                通过 GT AI Gateway
+                                <a-tooltip>
+                                    <template #title>
+                                        <div>代理模式：客户端通过 GtAIGateway 连接上游。</div>
+                                        <div>支持高级功能，如抓取请求流量进行分析、自动协议转换、提升缓存命中率等。</div>
+                                    </template>
+                                    <InfoCircleOutlined class="label-help-icon" style="margin-left: 4px;" />
+                                </a-tooltip>
+                            </span>
+                        </template>
                         <a-form-item label="协议">
                             <a-input :value="selectedProtocolLabel" disabled />
                         </a-form-item>
@@ -426,7 +470,15 @@
                         </a-form-item>
                     </a-tab-pane>
 
-                    <a-tab-pane :key="ClientConnectionMode.VENDOR" tab="直连上游供应商" :disabled="detailConfig.connectionMode !== ClientConnectionMode.VENDOR">
+                    <a-tab-pane :key="ClientConnectionMode.VENDOR" :disabled="detailConfig.connectionMode !== ClientConnectionMode.VENDOR">
+                        <template #tab>
+                            <span>
+                                直连上游供应商
+                                <a-tooltip title="直连模式：客户端直接连接上游供应商，不经过 GtAIGateway 代理。">
+                                    <InfoCircleOutlined class="label-help-icon" style="margin-left: 4px;" />
+                                </a-tooltip>
+                            </span>
+                        </template>
                         <a-form-item label="协议">
                             <a-input :value="selectedProtocolLabel" disabled />
                         </a-form-item>

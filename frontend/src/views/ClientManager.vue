@@ -683,9 +683,15 @@ function addBackup(backup: ClientConfigBackupInfo): void {
 }
 
 .config-flow {
-    align-items: center;
     display: inline-flex;
+    align-items: center;
     gap: 6px;
+    color: var(--text-secondary, #8c8c8c);
+    background: var(--bg-color-secondary, #fafafa);
+    padding: 2px 8px 2px 2px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid var(--border-color, #f0f0f0);
 }
 
 .flow-arrow {
@@ -699,11 +705,14 @@ function addBackup(backup: ClientConfigBackupInfo): void {
 }
 
 .model-text {
-    color: var(--text-primary);
-    font-size: 13px;
+    color: var(--text-primary, #262626);
+    font-weight: 500;
 }
 
 .merged-mode-tag {
+    margin-right: 2px;
+    border-radius: 4px;
+    border-color: transparent;
     font-size: 12px;
     line-height: 18px;
     padding: 0 8px;

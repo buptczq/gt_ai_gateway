@@ -805,7 +805,7 @@ async function sendRequest(
     }
 
     // 4. 请求体改写：根据高级设置将 system 中 x-anthropic-billing-header 的 cch 值固定为 A1234
-    if ((await configService.getConfig(ConfigKey.CCH_REWRITE_ENABLED, "false")).getBoolean()) {
+    if ((await configService.getConfig(ConfigKey.CCH_REWRITE_ENABLED, "true")).getBoolean()) {
         upstreamBody = rewriteCchInSystemPrompt(upstreamBody);
     }
 
@@ -842,7 +842,7 @@ async function sendRequest(
         }
     }
 
-    if (upstreamFormat === ApiFormat.RESPONSES && (await configService.getConfig(ConfigKey.RESPONSES_PROMPT_CACHE_KEY_ENABLED, "false")).getBoolean()) {
+    if (upstreamFormat === ApiFormat.RESPONSES && (await configService.getConfig(ConfigKey.RESPONSES_PROMPT_CACHE_KEY_ENABLED, "true")).getBoolean()) {
         const hostKey = await hostService.getHostKey();
         upstreamBody = injectResponsesPromptCacheKey(upstreamBody, hostKey, user.name);
     }

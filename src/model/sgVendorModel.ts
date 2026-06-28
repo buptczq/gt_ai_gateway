@@ -18,6 +18,14 @@ class SgVendorModel extends Model {
         try { return JSON.parse(this.allowed_formats) as ApiFormat[]; } catch { return null; }
     }
 
+    /**
+     * 获取当前 vendorModel 支持的格式列表
+     * @returns 支持的格式数组，未配置时返回 null 表示无限制
+     */
+    getSupportedFormats(): ApiFormat[] | null {
+        return this.getAllowedFormats();
+    }
+
     [inspect.custom](depth: number, options: InspectOptions) {
         return JSON.stringify(this.toData(), null, 2);
     }

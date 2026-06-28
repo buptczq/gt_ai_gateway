@@ -257,58 +257,30 @@ describe("SgVendor.getUrlByFormat — URL merge & resolution", () => {
         });
     });
 
-    describe("getUpstreamFormat", () => {
-        it("returns clientFormat if custom URL exists for client format", () => {
+    describe("getSupportedFormats", () => {
+        it("returns formats based on custom URLs", () => {
             const v = makeVendor("other", { anthropic: "https://a.com" });
-            expect(v.getUpstreamFormat(ApiFormat.ANTHROPIC)).toBe(ApiFormat.ANTHROPIC);
+            expect(v.getSupportedFormats()).toEqual([ApiFormat.ANTHROPIC]);
         });
 
-        it("returns clientFormat if default URL exists for client format", () => {
+        it("returns formats based on default URLs", () => {
             const v = makeVendor("anthropic");
-            expect(v.getUpstreamFormat(ApiFormat.ANTHROPIC)).toBe(ApiFormat.ANTHROPIC);
+            expect(v.getSupportedFormats()).toContain(ApiFormat.ANTHROPIC);
         });
 
-        it("returns alternative format if custom URL exists for it", () => {
-            const v = makeVendor("other", { openai: "https://a.com" });
-            expect(v.getUpstreamFormat(ApiFormat.ANTHROPIC)).toBe(ApiFormat.OPENAI);
-        });
-
-        it("returns alternative format if default URL exists for it", () => {
-            const v = makeVendor("google"); // Google only has openai preset
-            expect(v.getUpstreamFormat(ApiFormat.ANTHROPIC)).toBe(ApiFormat.OPENAI);
-        });
-
-        it("returns responses format for Anthropic client when only responses URL exists", () => {
-            const v = makeVendor("other", { responses: "https://a.com/responses" });
-            expect(v.getUpstreamFormat(ApiFormat.ANTHROPIC)).toBe(ApiFormat.RESPONSES);
-        });
-
-        it("prefers OpenAI over Responses for Anthropic client when both alternatives exist", () => {
+        it("returns multiple formats when multiple URLs exist", () => {
             const v = makeVendor("other", {
-                openai: "https://a.com/v1/chat/completions",
-                responses: "https://a.com/responses",
+                openai: "https://a.com/v1",
+                anthropic: "https://b.com/v1",
             });
-            expect(v.getUpstreamFormat(ApiFormat.ANTHROPIC)).toBe(ApiFormat.OPENAI);
+            const formats = v.getSupportedFormats();
+            expect(formats).toContain(ApiFormat.OPENAI);
+            expect(formats).toContain(ApiFormat.ANTHROPIC);
         });
 
-        it("does not route OpenAI client to Responses because that conversion is unsupported", () => {
-            const v = makeVendor("other", { responses: "https://a.com/responses" });
-            expect(v.getUpstreamFormat(ApiFormat.OPENAI)).toBe(ApiFormat.OPENAI);
-        });
-
-        it("keeps Responses format when an OpenAI base URL can serve /responses", () => {
-            const v = makeVendor("other", { openai: "https://a.com/v1" });
-            expect(v.getUpstreamFormat(ApiFormat.RESPONSES)).toBe(ApiFormat.RESPONSES);
-        });
-
-        it("returns Anthropic format for Responses client when only anthropic URL exists", () => {
-            const v = makeVendor("other", { anthropic: "https://a.com/v1/messages" });
-            expect(v.getUpstreamFormat(ApiFormat.RESPONSES)).toBe(ApiFormat.ANTHROPIC);
-        });
-
-        it("returns clientFormat if no URL exists", () => {
+        it("returns empty array when no URLs exist", () => {
             const v = makeVendor("other");
-            expect(v.getUpstreamFormat(ApiFormat.ANTHROPIC)).toBe(ApiFormat.ANTHROPIC);
+            expect(v.getSupportedFormats()).toEqual([]);
         });
     });
 });

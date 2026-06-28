@@ -48,46 +48,41 @@ function calculateCost(
 type Dict = Record<string, unknown>;
 
 
-function canVendorServeFormat(vendor: SgVendor, format: ApiFormat): boolean {
-    try {
-        vendor.getUrlByFormat(format);
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-
-function canConvertFormat(clientFormat: ApiFormat, upstreamFormat: ApiFormat): boolean {
-    if (clientFormat === upstreamFormat) {
-        return true;
-    }
-    return ConverterFactory.createPair(clientFormat, upstreamFormat) !== null;
-}
-
-
+/**
+ * 解析上游支持的格式
+ * 根据客户端请求的格式和支持的格式列表，计算最终应该用什么格式
+ *
+ * @param clientFormat - 客户端请求的格式
+ * @param supportedFormats - 支持的格式列表（vendor 或 vendorModel 的）
+ * @returns 最终应该使用的格式
+ */
 function resolveUpstreamFormat(
-    vendor: SgVendor,
     clientFormat: ApiFormat,
-    upstreamFormat: ApiFormat,
-    allowedFormats: ApiFormat[] | null | undefined,
+    supportedFormats: ApiFormat[],
 ): ApiFormat {
-    if (!allowedFormats || allowedFormats.includes(upstreamFormat)) {
-        return upstreamFormat;
+    // 如果支持客户端格式，直接使用
+    if (supportedFormats.includes(clientFormat)) {
+        return clientFormat;
     }
 
-    const override = allowedFormats.find((format) =>
-        canVendorServeFormat(vendor, format) &&
-        canConvertFormat(clientFormat, format),
-    );
-    if (override) {
-        return override;
+    // Responses 格式：如果没有 urls[RESPONSES]，但有 urls[OPENAI]，则使用 OPENAI 格式
+    if (clientFormat === ApiFormat.RESPONSES && supportedFormats.includes(ApiFormat.OPENAI)) {
+        return ApiFormat.OPENAI;
     }
 
-    throw new customError.AppError(
-        `Model does not support format: ${upstreamFormat}. Allowed: ${allowedFormats.join(", ")}`,
-        400,
-    );
+    // 尝试其他支持的格式
+    const supportedAlternativeFormats: Partial<Record<ApiFormat, ApiFormat[]>> = {
+        [ApiFormat.OPENAI]: [ApiFormat.ANTHROPIC],
+        [ApiFormat.ANTHROPIC]: [ApiFormat.OPENAI, ApiFormat.RESPONSES],
+        [ApiFormat.RESPONSES]: [ApiFormat.ANTHROPIC],
+    };
+
+    for (const fmt of supportedAlternativeFormats[clientFormat] ?? []) {
+        if (supportedFormats.includes(fmt)) return fmt;
+    }
+
+    // 如果没有找到支持的格式，返回客户端请求的格式
+    return clientFormat;
 }
 
 
@@ -706,20 +701,27 @@ async function sendRequest(
     format: ApiFormat,
     body: string,
 ): Promise<Response> {
-    let upstreamFormat = vendor.getUpstreamFormat(format);
-
     let vendorModelName: string | null = null;
+    let supportedFormats: ApiFormat[] | null = null;
+
     if (modelConfig.vendor_model_id) {
         const vendorModel = await SgVendorModel.query().find(modelConfig.vendor_model_id);
-        const allowed = vendorModel?.getAllowedFormats();
-        upstreamFormat = resolveUpstreamFormat(vendor, format, upstreamFormat, allowed);
         if (vendorModel) {
             vendorModelName = vendorModel.model_id;
+            supportedFormats = vendorModel.getSupportedFormats();
         }
     } else {
         // 自动模式：由于未指定上游映射，实际上游接收到的模型名称就是用户请求的模型名（或网关模型名）
         vendorModelName = modelConfig.name;
     }
+
+    // 如果 vendorModel 未配置限制格式，使用 vendor 支持的格式
+    if (!supportedFormats) {
+        supportedFormats = vendor.getSupportedFormats();
+    }
+
+    // 根据客户端请求的格式和 vendor/vendorModel 支持的格式，计算最终应该用什么格式
+    const upstreamFormat = resolveUpstreamFormat(format, supportedFormats);
 
     const needsConversion = format !== upstreamFormat;
 

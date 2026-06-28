@@ -4,6 +4,7 @@ import { SgModel } from "../model/sgModel";
 import vendorService from "../service/vendorService";
 import vendorDefaultUrls from "../service/vendorDefaultUrls";
 import ormService from "../service/ormService";
+import senderService from "../service/senderService";
 import customError from "../util/customError";
 import { ApiFormat } from "../constants";
 import { createListResponse, parsePaginationQuery } from "../util/pagination";
@@ -189,7 +190,7 @@ async function testVendor(c: Context) {
     let convertedTo: string | undefined;
 
     if (auto_convert) {
-        const upstreamFormat = vendor.getUpstreamFormat(format);
+        const upstreamFormat = senderService.resolveUpstreamFormat(format, vendor.getSupportedFormats());
         if (upstreamFormat !== format) {
             convertedFrom = format;
             convertedTo = upstreamFormat;

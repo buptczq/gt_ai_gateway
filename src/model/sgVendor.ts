@@ -3,6 +3,7 @@ import { inspect, InspectOptions } from "util";
 import { VendorType, ApiFormat } from "../constants";
 import vendorDefaultUrls from "../service/vendorDefaultUrls";
 import customError from "../util/customError";
+import urlUtil from "../util/urlUtil";
 
 class SgVendor extends Model {
     table = "vendor";
@@ -45,61 +46,57 @@ class SgVendor extends Model {
      * @returns URL string for the specified format
      * @throws Error if URL cannot be found or determined
      */
+    /**
+     * 根据 API 格式获取对应的 URL
+     * @param format - API 格式（openai, anthropic, responses）
+     * @returns 完整的 URL 字符串
+     */
     getUrlByFormat(format: ApiFormat): string {
         const urls = this.getMergedUrls();
-        const url = format === ApiFormat.RESPONSES
-            ? urls[ApiFormat.RESPONSES] ?? urls[ApiFormat.OPENAI]
-            : urls[format];
+        let url: string | undefined;
 
-        if (!url) {
-            throw new customError.AppError(`vendor does not have url for ${format} format`, 400);
+        if (format === ApiFormat.RESPONSES) {
+            // Responses 格式：优先使用 urls[RESPONSES]
+            if (urls[ApiFormat.RESPONSES]) {
+                url = urls[ApiFormat.RESPONSES];
+                return url.includes("/responses") ? url : url.replace(/\/$/, "") + "/responses";
+            }
+            // 没有 urls[RESPONSES]，获取 OPENAI URL 并转换为 RESPONSES 格式
+            return urlUtil.convertOpenaiToResponses(this.getUrlByFormat(ApiFormat.OPENAI));
         }
 
-        // Normalize URL - Add missing paths if not present
-        let finalUrl = url;
-        if (format === ApiFormat.ANTHROPIC && !url.includes("/v1/messages")) {
-            finalUrl = url.replace(/\/$/, "") + "/v1/messages";
-        }
-        
-        if (format === ApiFormat.OPENAI && !url.includes("/chat/completions")) {
-            finalUrl = url.replace(/\/$/, "") + "/chat/completions";
+        if (format === ApiFormat.ANTHROPIC) {
+            // Anthropic 格式：使用 urls[ANTHROPIC]
+            url = urls[ApiFormat.ANTHROPIC];
+            if (url) {
+                return url.includes("/v1/messages") ? url : url.replace(/\/$/, "") + "/v1/messages";
+            }
         }
 
-        if (format === ApiFormat.RESPONSES && !url.includes("/responses")) {
-            finalUrl = url.replace(/\/$/, "") + "/responses";
+        if (format === ApiFormat.OPENAI) {
+            // OpenAI 格式：使用 urls[OPENAI]
+            url = urls[ApiFormat.OPENAI];
+            if (url) {
+                return url.includes("/chat/completions") ? url : url.replace(/\/$/, "") + "/chat/completions";
+            }
         }
 
-        return finalUrl;
+        throw new customError.AppError(`vendor does not have url for ${format} format`, 400);
     }
 
     /**
-     * Get the upstream format for protocol conversion.
-     * Checks if the vendor supports the requested clientFormat natively (via custom URLs or default URLs).
-     * If not, tries to find an alternative format with a supported converter.
+     * 获取当前 vendor 支持的格式列表
+     * @returns 支持的格式数组
      */
-    getUpstreamFormat(clientFormat: ApiFormat): ApiFormat {
+    getSupportedFormats(): ApiFormat[] {
         const urls = this.getMergedUrls();
+        const formats: ApiFormat[] = [];
 
-        if (urls[clientFormat]) {
-            return clientFormat;
-        }
+        if (urls[ApiFormat.OPENAI]) formats.push(ApiFormat.OPENAI);
+        if (urls[ApiFormat.ANTHROPIC]) formats.push(ApiFormat.ANTHROPIC);
+        if (urls[ApiFormat.RESPONSES]) formats.push(ApiFormat.RESPONSES);
 
-        if (clientFormat === ApiFormat.RESPONSES && urls[ApiFormat.OPENAI]) {
-            return clientFormat;
-        }
-
-        const supportedAlternativeFormats: Partial<Record<ApiFormat, ApiFormat[]>> = {
-            [ApiFormat.OPENAI]: [ApiFormat.ANTHROPIC],
-            [ApiFormat.ANTHROPIC]: [ApiFormat.OPENAI, ApiFormat.RESPONSES],
-            [ApiFormat.RESPONSES]: [ApiFormat.ANTHROPIC],
-        };
-
-        for (const fmt of supportedAlternativeFormats[clientFormat] ?? []) {
-            if (urls[fmt]) return fmt;
-        }
-
-        // If no format can be determined, or format doesn't support conversion, just return client format
-        return clientFormat;
+        return formats;
     }
 
     [inspect.custom](depth: number, options: InspectOptions) {

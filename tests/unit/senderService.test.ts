@@ -10,7 +10,6 @@ import senderService from "../../src/service/senderService";
 import { ConverterFactory } from "../../src/util/protocolConverter/ConverterFactory";
 import { ApiFormat } from "../../src/constants";
 import customError from "../../src/util/customError";
-import { SgVendor } from "../../src/model/sgVendor";
 
 function convertRequestBody(body: string, clientFormat: ApiFormat, upstreamFormat: ApiFormat): string {
     if (clientFormat !== upstreamFormat && (clientFormat === ApiFormat.RESPONSES || upstreamFormat === ApiFormat.RESPONSES)) {
@@ -25,21 +24,9 @@ function convertRequestBody(body: string, clientFormat: ApiFormat, upstreamForma
 }
 
 
-function makeVendor(urls: Record<string, string>): SgVendor {
-    const vendor = new SgVendor();
-    vendor.type = "other" as any;
-    vendor.token = "test-token";
-    vendor.urls = JSON.stringify(urls);
-    return vendor;
-}
-
-
 describe("resolveUpstreamFormat", () => {
-    it("uses Responses for Anthropic client when model only allows Responses and vendor has an OpenAI base URL", () => {
-        const vendor = makeVendor({ openai: "https://api.openai.com/v1" });
+    it("uses Responses for Anthropic client when only Responses is supported", () => {
         const upstreamFormat = senderService.resolveUpstreamFormat(
-            vendor,
-            ApiFormat.ANTHROPIC,
             ApiFormat.ANTHROPIC,
             [ApiFormat.RESPONSES],
         );
@@ -47,15 +34,40 @@ describe("resolveUpstreamFormat", () => {
         expect(upstreamFormat).toBe(ApiFormat.RESPONSES);
     });
 
-    it("does not choose an allowed format without a supported conversion path", () => {
-        const vendor = makeVendor({ responses: "https://api.openai.com/v1/responses" });
-
-        expect(() => senderService.resolveUpstreamFormat(
-            vendor,
-            ApiFormat.OPENAI,
+    it("falls back to client format when no supported conversion path", () => {
+        const upstreamFormat = senderService.resolveUpstreamFormat(
             ApiFormat.OPENAI,
             [ApiFormat.RESPONSES],
-        )).toThrow("Model does not support format: openai. Allowed: responses");
+        );
+
+        expect(upstreamFormat).toBe(ApiFormat.OPENAI);
+    });
+
+    it("returns client format directly when vendor supports it", () => {
+        const upstreamFormat = senderService.resolveUpstreamFormat(
+            ApiFormat.OPENAI,
+            [ApiFormat.OPENAI, ApiFormat.ANTHROPIC],
+        );
+
+        expect(upstreamFormat).toBe(ApiFormat.OPENAI);
+    });
+
+    it("converts Responses to OPENAI when vendor only supports OPENAI", () => {
+        const upstreamFormat = senderService.resolveUpstreamFormat(
+            ApiFormat.RESPONSES,
+            [ApiFormat.OPENAI],
+        );
+
+        expect(upstreamFormat).toBe(ApiFormat.OPENAI);
+    });
+
+    it("converts ANTHROPIC to OPENAI when vendor only supports OPENAI", () => {
+        const upstreamFormat = senderService.resolveUpstreamFormat(
+            ApiFormat.ANTHROPIC,
+            [ApiFormat.OPENAI],
+        );
+
+        expect(upstreamFormat).toBe(ApiFormat.OPENAI);
     });
 });
 

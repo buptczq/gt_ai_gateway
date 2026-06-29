@@ -9,6 +9,9 @@ import hostService from "./service/hostService";
 import app, { Env } from "./routes";
 import initLogger, { Logger } from "./util/logger";
 
+// --api-only: 跳过前端静态文件服务，仅提供 API（桌面 sidecar 模式使用）
+export const apiOnly = process.argv.includes("--api-only"); console.log("API_ONLY:", apiOnly, process.argv);
+
 // 加载环境变量
 // Tauri 等环境传入的变量优先级最高，.dev.vars 仅作为兜底（不会覆盖已有变量）
 config({ path: join(process.cwd(), ".dev.vars"), override: false });
@@ -99,53 +102,55 @@ async function startServer() {
         ROOT_TOKEN: process.env.ROOT_TOKEN || "",
     };
 
-    // Static file serving (frontend) - only for local development
-    const distPath = join(process.cwd(), "frontend", "dist");
+    // Static file serving (frontend) - skip in API-only mode (desktop sidecar)
+    if (!apiOnly) {
+        const distPath = join(process.cwd(), "frontend", "dist");
 
-    // Pre-read index.html for SPA fallback
-    let indexHtml: string;
-    try {
-        indexHtml = readFileSync(join(distPath, "index.html"), "utf-8");
-    } catch (e) {
-        console.warn("Could not read index.html, SPA fallback will not work:", e);
-        indexHtml = "<!doctype html><html><body>Frontend not built</body></html>";
-    }
-
-    // SPA fallback - return index.html for all non-API routes
-    // This must be registered BEFORE static file serving to handle non-existent files
-    app.get("*", async (c, next) => {
-        const url = new URL(c.req.url);
-        const pathname = url.pathname;
-
-        // Let asset files pass through to serveStatic middleware
-        if (pathname.startsWith("/assets/") || pathname.startsWith("/data_viewer/")) {
-            return next();
+        // Pre-read index.html for SPA fallback
+        let indexHtml: string;
+        try {
+            indexHtml = readFileSync(join(distPath, "index.html"), "utf-8");
+        } catch (e) {
+            console.warn("Could not read index.html, SPA fallback will not work:", e);
+            indexHtml = "<!doctype html><html><body>Frontend not built</body></html>";
         }
 
-        // Handle SVG files directly
-        if (pathname.endsWith(".svg")) {
-            try {
-                const fileName = pathname.substring(1); // Remove leading /
-                const filePath = join(distPath, fileName);
-                const content = readFileSync(filePath, "utf-8");
-                return c.body(content, 200, { "Content-Type": "image/svg+xml" });
-            } catch (e) {
-                return c.notFound();
+        // SPA fallback - return index.html for all non-API routes
+        // This must be registered BEFORE static file serving to handle non-existent files
+        app.get("*", async (c, next) => {
+            const url = new URL(c.req.url);
+            const pathname = url.pathname;
+
+            // Let asset files pass through to serveStatic middleware
+            if (pathname.startsWith("/assets/") || pathname.startsWith("/data_viewer/")) {
+                return next();
             }
-        }
 
-        // Skip API routes
-        if (pathname.startsWith("/v1/") || pathname.startsWith("/llm/") || pathname.includes(".json")) {
-            return c.json({ error: "Not found" }, 404);
-        }
+            // Handle SVG files directly
+            if (pathname.endsWith(".svg")) {
+                try {
+                    const fileName = pathname.substring(1); // Remove leading /
+                    const filePath = join(distPath, fileName);
+                    const content = readFileSync(filePath, "utf-8");
+                    return c.body(content, 200, { "Content-Type": "image/svg+xml" });
+                } catch (e) {
+                    return c.notFound();
+                }
+            }
 
-        // Return index.html for SPA routing
-        return c.html(indexHtml, 200);
-    });
+            // Skip API routes
+            if (pathname.startsWith("/v1/") || pathname.startsWith("/llm/") || pathname.includes(".json")) {
+                return c.json({ error: "Not found" }, 404);
+            }
 
-    // Static file serving for built frontend assets
-    app.use("/assets/*", serveStatic({ root: distPath }));
-    app.use("/data_viewer/*", serveStatic({ root: distPath }));
+            // Return index.html for SPA routing
+            return c.html(indexHtml, 200);
+        });
+
+        // Static file serving for built frontend assets
+        app.use("/assets/*", serveStatic({ root: distPath }));
+        app.use("/data_viewer/*", serveStatic({ root: distPath }));
+    }
 
     const hostname = hostService.getLocalHost();
 

@@ -543,7 +543,7 @@ function applyConfig(client: ClientName, backupId?: number): void {
 
     Modal.confirm({
         title: `切换 ${target?.displayName || '客户端'} 配置？`,
-        content: `将使用「${selectedBackup.name}」覆盖当前配置。`,
+        content: `将这一份配置写入到 ${target?.displayName || '客户端'} 的配置文件`,
         okText: '切换',
         okType: 'danger',
         cancelText: '取消',

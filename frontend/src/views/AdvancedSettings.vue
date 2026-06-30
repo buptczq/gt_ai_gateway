@@ -34,7 +34,7 @@
                     </div>
                     <div class="setting-item">
                         <div class="setting-info">
-                            <div class="setting-title">Responses API Prompt Caching</div>
+                            <div class="setting-title">Responses API 粘性路由</div>
                             <div class="setting-desc">启用后，会在 Responses API 请求中自动注入 prompt_cache_key，优化缓存命中率</div>
                         </div>
                         <div class="setting-action">

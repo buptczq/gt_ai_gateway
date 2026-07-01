@@ -151,7 +151,7 @@ function normalizeBackupRecords(records: any): any[] {
 async function getBackups(client: ClientName, adapter: ConfigAdapter): Promise<ClientConfigBackupInfo[]> {
     const records = await SgClientConfig.query()
         .where("client", client)
-        .orderBy("id", "desc")
+        .orderBy("id", "asc")
         .get();
 
     return await Promise.all(normalizeBackupRecords(records).map(record => toBackupInfo(record, adapter)));
@@ -161,7 +161,7 @@ async function getBackups(client: ClientName, adapter: ConfigAdapter): Promise<C
 async function enrichStatus(adapterStatus: AdapterConfigStatus, adapter: ConfigAdapter): Promise<ClientConfigStatus> {
     const records = await SgClientConfig.query()
         .where("client", adapterStatus.client)
-        .orderBy("id", "desc")
+        .orderBy("id", "asc")
         .get();
 
     const backupRecords = normalizeBackupRecords(records);

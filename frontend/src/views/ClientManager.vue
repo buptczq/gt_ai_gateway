@@ -408,9 +408,13 @@ async function handleConfigSave(request: any): Promise<void> {
     if (backup) {
         if (backup.enabled) {
             const clientName = client.displayName || '客户端';
-            let restartHint = `注意：切换后，请退出 ${clientName} 再重新打开，客户端将会使用新配置。`;
+            let restartHint: any = `注意：切换后，请退出 ${clientName} 再重新打开，客户端将会使用新配置。`;
             if (client.client === ClientName.CODEX) {
-                restartHint = `注意：切换后，请彻底退出并重新打开 ${clientName}。此外，需要开启新会话才会切换到新模型（codex会将旧会话绑定到之前的模型）。`;
+                restartHint = [
+                    createVNode('div', { style: 'font-weight: 500; margin-bottom: 4px;' }, '注意：'),
+                    createVNode('div', null, `1. 切换后，请彻底退出并重新打开 ${clientName}。`),
+                    createVNode('div', { style: 'margin-top: 2px;' }, `2. 需要开启新会话才会切换到新模型（codex会将旧会话绑定到之前的模型）。`)
+                ];
             }
 
             Modal.confirm({
@@ -527,7 +531,7 @@ async function backupCurrentConfig(client: ClientName, showSuccess = true): Prom
     backingUpClient.value = client;
     try {
         const backup = await createClientConfigBackup({ client });
-        target.backups = [backup, ...target.backups];
+        target.backups = [...target.backups, backup];
         target.backupCount = target.backups.length;
         target.backupExists = target.backupCount > 0;
         if (showSuccess) {
@@ -579,9 +583,13 @@ function applyConfig(client: ClientName, backupId?: number): void {
     }
 
     const clientName = target?.displayName || '客户端';
-    let restartHint = `注意：切换后，请退出 ${clientName} 再重新打开，客户端将会使用新配置。`;
+    let restartHint: any = `注意：切换后，请退出 ${clientName} 再重新打开，客户端将会使用新配置。`;
     if (client === ClientName.CODEX) {
-        restartHint = `注意：切换后，请彻底退出并重新打开 ${clientName}。此外，需要开启新会话才会切换到新模型（codex会将旧会话绑定到之前的模型）。`;
+        restartHint = [
+            createVNode('div', { style: 'font-weight: 500; margin-bottom: 4px;' }, '注意：'),
+            createVNode('div', null, `1. 切换后，请彻底退出并重新打开 ${clientName}。`),
+            createVNode('div', { style: 'margin-top: 2px;' }, `2. 需要开启新会话才会切换到新模型（codex会将旧会话绑定到之前的模型）。`)
+        ];
     }
 
     Modal.confirm({
